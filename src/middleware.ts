@@ -27,6 +27,26 @@ export default function middleware(
   request: NextRequest,
   event: NextFetchEvent,
 ) {
+  const pathname = request.nextUrl.pathname;
+  const isApi = pathname.startsWith('/api') || pathname.startsWith('/trpc');
+
+  // ✅ API / tRPC：不跑 next-intl（避免 locale redirect/rewrite），但仍可跑 Clerk
+  if (isApi) {
+    return clerkMiddleware(async (auth, req) => {
+      // 你已经把 /api(.*) 放进 isProtectedRoute 里了，因此这里会 protect
+      if (isProtectedRoute(req)) {
+        // 对 API 来说，不需要构造 locale sign-in；直接给一个固定 sign-in 也可以
+        // 如果你一定要保持 next-intl locale 依赖的 workaround，可以保留原逻辑
+        await auth.protect({
+          unauthenticatedUrl: new URL('/sign-in', req.url).toString(),
+        });
+      }
+
+      // ❗关键：API 直接 next，不要 intlMiddleware
+      return NextResponse.next();
+    })(request, event);
+  }
+
   if (
     request.nextUrl.pathname.includes('/sign-in')
     || request.nextUrl.pathname.includes('/sign-up')
