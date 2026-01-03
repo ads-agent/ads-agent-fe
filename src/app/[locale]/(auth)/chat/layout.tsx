@@ -2,37 +2,114 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
+import {
+  createThread,
+  deleteThread,
+  listThreads,
+  type Thread as ThreadT,
+} from '@/features/chat/thread-store';
 
-type ChatThreadItem = {
-  id: string;
-  title: string;
-  href: string;
-};
+function startOfDay(ts: number) {
+  const d = new Date(ts);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+function groupThreads(threads: ThreadT[]) {
+  const now = Date.now();
+  const today = startOfDay(now);
+  const yesterday = today - 86400000;
+  const weekAgo = today - 7 * 86400000;
+
+  const gToday: ThreadT[] = [];
+  const gYesterday: ThreadT[] = [];
+  const gWeek: ThreadT[] = [];
+  const gOlder: ThreadT[] = [];
+
+  for (const t of threads) {
+    if (t.updatedAt >= today) {
+      gToday.push(t);
+    } else if (t.updatedAt >= yesterday) {
+      gYesterday.push(t);
+    } else if (t.updatedAt >= weekAgo) {
+      gWeek.push(t);
+    } else {
+      gOlder.push(t);
+    }
+  }
+
+  const groups: { label: string; items: ThreadT[] }[] = [];
+  if (gToday.length) {
+    groups.push({ label: 'Today', items: gToday });
+  }
+  if (gYesterday.length) {
+    groups.push({ label: 'Yesterday', items: gYesterday });
+  }
+  if (gWeek.length) {
+    groups.push({ label: 'Previous 7 Days', items: gWeek });
+  }
+  if (gOlder.length) {
+    groups.push({ label: 'Older', items: gOlder });
+  }
+
+  return groups;
+}
+
+function getActiveThreadId(pathname: string | null) {
+  if (!pathname) {
+    return null;
+  }
+  const m = pathname.match(/\/chat\/([^/]+)/);
+  return m?.[1] ?? null;
+}
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // 先用“占位对话列表”（未来换成真实数据即可）
-  const threads: ChatThreadItem[] = useMemo(() => {
-    return [
-      { id: 't1', title: 'Getting started', href: '/chat' },
-      { id: 't2', title: 'Pricing questions', href: '/chat' },
-      { id: 't3', title: 'Ideas for my SaaS', href: '/chat' },
-      { id: 't4', title: 'Drafting marketing copy', href: '/chat' },
-    ];
+  const activeThreadId = getActiveThreadId(pathname);
+
+  const [threads, setThreads] = useState<ThreadT[]>([]);
+
+  useEffect(() => {
+    setThreads(listThreads());
   }, []);
 
-  const isActive = (href: string) => {
-    // 这里简单按 pathname 是否包含 /chat 来处理 active，
-    // 将来你做 /chat/[threadId] 时可以更精确匹配。
-    if (!pathname) {
-      return false;
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'chat_threads_v1') {
+        setThreads(listThreads());
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  const groups = useMemo(() => groupThreads(threads), [threads]);
+
+  const activeThread = useMemo(() => {
+    if (!activeThreadId) {
+      return null;
     }
-    return href === '/chat' ? pathname.includes('/chat') : pathname === href;
+    return threads.find(t => t.id === activeThreadId) ?? null;
+  }, [threads, activeThreadId]);
+
+  const onNewChat = () => {
+    const id = createThread();
+    setThreads(listThreads());
+    setSidebarOpen(false);
+    window.location.assign(`/chat/${id}`);
+  };
+
+  const onDeleteThread = (id: string) => {
+    deleteThread(id);
+    setThreads(listThreads());
+    if (activeThreadId === id) {
+      window.location.assign('/chat');
+    }
   };
 
   return (
@@ -79,43 +156,62 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
             {/* New chat button */}
             <div className="px-3 pb-3">
-              <Link
-                href="/chat"
-                className="flex items-center justify-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm font-medium hover:bg-muted"
-                onClick={() => setSidebarOpen(false)}
+              <button
+                type="button"
+                onClick={onNewChat}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm font-medium hover:bg-muted"
               >
                 <span className="text-base">＋</span>
                 New chat
-              </Link>
+              </button>
             </div>
 
             {/* Threads list */}
             <div className="flex-1 overflow-y-auto px-2">
-              <div className="px-2 pb-2 text-xs font-medium text-muted-foreground">
-                Recent
-              </div>
+              {groups.length === 0
+                ? (
+                    <div className="px-3 py-2 text-sm text-muted-foreground">
+                      No conversations yet.
+                    </div>
+                  )
+                : (
+                    groups.map(g => (
+                      <div key={g.label} className="mb-3">
+                        <div className="px-2 pb-2 text-xs font-medium text-muted-foreground">
+                          {g.label}
+                        </div>
 
-              <nav className="space-y-1">
-                {threads.map((t) => {
-                  const active = isActive(t.href);
-                  return (
-                    <Link
-                      key={t.id}
-                      href={t.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={[
-                        'group flex items-center justify-between rounded-lg px-3 py-2 text-sm',
-                        active ? 'bg-muted' : 'hover:bg-muted/70',
-                      ].join(' ')}
-                    >
-                      <span className="truncate">{t.title}</span>
-                      <span className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
-                        ⋯
-                      </span>
-                    </Link>
-                  );
-                })}
-              </nav>
+                        <nav className="space-y-1">
+                          {g.items.map((t) => {
+                            const active = activeThreadId === t.id;
+                            return (
+                              <div key={t.id} className="group flex items-center">
+                                <Link
+                                  href={`/chat/${t.id}`}
+                                  onClick={() => setSidebarOpen(false)}
+                                  className={[
+                                    'flex-1 truncate rounded-lg px-3 py-2 text-sm',
+                                    active ? 'bg-muted' : 'hover:bg-muted/70',
+                                  ].join(' ')}
+                                >
+                                  {t.title}
+                                </Link>
+
+                                <button
+                                  type="button"
+                                  className="ml-1 rounded-md p-2 text-muted-foreground opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100"
+                                  aria-label="Delete thread"
+                                  onClick={() => onDeleteThread(t.id)}
+                                >
+                                  ⋯
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </nav>
+                      </div>
+                    ))
+                  )}
             </div>
 
             {/* Sidebar footer */}
@@ -149,7 +245,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
           </div>
         </aside>
 
-        {/* Main column (with left padding on desktop to make room for sidebar) */}
+        {/* Main column */}
         <div className="flex h-screen flex-col md:pl-72">
           {/* Top bar */}
           <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -165,16 +261,21 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <span className="text-sm font-semibold">Chat</span>
               <span className="truncate text-xs text-muted-foreground">
-                ChatGPT-style workspace
+                {activeThread?.title ?? 'New chat'}
               </span>
             </div>
 
-            {/* Right side actions (placeholders) */}
             <div className="flex items-center gap-2">
-              <button type="button" className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted">
+              <button
+                type="button"
+                className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
+              >
                 Share
               </button>
-              <button type="button" className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted">
+              <button
+                type="button"
+                className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
+              >
                 ⋯
               </button>
             </div>

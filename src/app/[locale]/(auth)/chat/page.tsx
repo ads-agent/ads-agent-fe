@@ -1,25 +1,18 @@
+// src/app/[locale]/(auth)/chat/page.tsx
 'use client';
 
-import { AssistantRuntimeProvider } from '@assistant-ui/react';
-import { AssistantChatTransport, useChatRuntime } from '@assistant-ui/react-ai-sdk';
-import React from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-import { Thread } from '@/components/assistant-ui/thread';
+import { createThread } from '@/features/chat/thread-store';
 
-export default function ChatPage() {
-  const runtime = useChatRuntime({
-    transport: new AssistantChatTransport({
-      api: '/api/chat',
-    }),
-  });
+export default function ChatIndexPage() {
+  const router = useRouter();
 
-  return (
-    <div className="flex size-full justify-center overflow-hidden">
-      <div className="flex size-full max-w-3xl flex-col">
-        <AssistantRuntimeProvider runtime={runtime}>
-          <Thread />
-        </AssistantRuntimeProvider>
-      </div>
-    </div>
-  );
+  useEffect(() => {
+    const id = createThread();
+    router.replace(`/chat/${id}`);
+  }, [router]);
+
+  return null;
 }
