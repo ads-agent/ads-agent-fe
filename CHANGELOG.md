@@ -1,3 +1,12 @@
+# 1.0.0 (2026-01-03)
+
+
+### Features
+
+* [1/n][ChatUI] Add assistant-ui dependencies ([a1f516f](https://github.com/ads-agent/ads-agent-fe/commit/a1f516fdfa23c8d29a38924823bb3f695c3b79d1))
+* [2/n][ChatUI] Add a chat UI prototype ([dfb691c](https://github.com/ads-agent/ads-agent-fe/commit/dfb691c7643b09843b9346993ce46eafdd0d9010))
+* [3/n][ChatUI] Add threads and polish the UI ([b7538d8](https://github.com/ads-agent/ads-agent-fe/commit/b7538d8fb3a0cf635eaeb5735e5030c567c65e5a))
+
 ## [1.7.7](https://github.com/ixartz/SaaS-Boilerplate/compare/v1.7.6...v1.7.7) (2025-12-12)
 
 
