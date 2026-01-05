@@ -10,6 +10,7 @@
 * **chat-ui**: increase chat window maximum width for better readability on large screens
 * **chat-ui**: refine logo usage with `adbuddy_logo_small.png` and hover-to-expand behavior in collapsed sidebar
 * **chat-ui**: hide thread list in collapsed sidebar state for cleaner UI
+* **branding**: comment out promotional `DemoBadge` and `DemoBanner` for production readiness
 
 ## [1.7.7](https://github.com/ixartz/SaaS-Boilerplate/compare/v1.7.6...v1.7.7) (2025-12-12)
 
