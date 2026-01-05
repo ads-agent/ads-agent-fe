@@ -1,3 +1,12 @@
+## [1.8.1] (2026-01-05)
+
+
+### Features
+
+* **chat**: refactor chat routing to use optional catch-all `[[...threadId]]` for better new thread handling
+* **chat**: implement server-side thread ID generation and metadata-driven URL updates without page reload
+* **api**: refactor chat route to support streaming metadata (thread ID, run ID) from custom backend
+
 ## [1.8.0] (2026-01-04)
 
 

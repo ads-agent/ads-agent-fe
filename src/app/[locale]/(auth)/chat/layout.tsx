@@ -17,7 +17,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
-  createThread,
   deleteThread,
   listThreads,
   type Thread as ThreadT,
@@ -111,10 +110,8 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   }, [threads, activeThreadId]);
 
   const onNewChat = () => {
-    const id = createThread();
-    setThreads(listThreads());
     setSidebarOpen(false);
-    window.location.assign(`/chat/${id}`);
+    window.location.assign('/chat');
   };
 
   const onDeleteThread = (id: string) => {

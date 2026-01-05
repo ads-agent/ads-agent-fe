@@ -3,8 +3,6 @@ import { createOpenAI, openai } from '@ai-sdk/openai';
 import { auth } from '@clerk/nextjs/server';
 import {
   convertToModelMessages,
-  createUIMessageStream,
-  createUIMessageStreamResponse,
   streamText,
 } from 'ai';
 import { z } from 'zod';
@@ -34,7 +32,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { messages, system, threadId } = parsed.data;
+    const { messages, system, threadId: reqThreadId } = parsed.data;
 
     // Determine which provider to use based on environment configuration
     let model;
@@ -58,8 +56,8 @@ export async function POST(req: Request) {
             body = {};
           }
 
-          if (threadId) {
-            body.thread_id = threadId;
+          if (reqThreadId) {
+            body.thread_id = reqThreadId;
           }
 
           return fetch(url, {
@@ -79,31 +77,38 @@ export async function POST(req: Request) {
 
     const modelMessages = await convertToModelMessages(messages);
 
-    const stream = createUIMessageStream({
-      async execute({ writer }) {
-        try {
-          const result = streamText({
-            model,
-            system: system ?? 'You are a helpful assistant. Be concise unless the user asks for details.',
-            messages: modelMessages,
-            temperature: 0.2,
-          });
-
-          writer.merge(result.toUIMessageStream());
-          await result.consumeStream();
-        } catch (err) {
-          console.error('[api/chat] execute error', { requestId, threadId, err });
-          throw err;
-        }
-      },
-
-      onError: (err) => {
-        console.error('[api/chat] stream error', { requestId, threadId, err });
-        return `Server error: ${err instanceof Error ? err.message : String(err)}`;
-      },
+    const result = streamText({
+      model,
+      system: system ?? 'You are a helpful assistant. Be concise unless the user asks for details.',
+      messages: modelMessages,
+      temperature: 0.2,
+      includeRawChunks: true, // Enable raw chunks to capture provider-specific data
     });
 
-    return createUIMessageStreamResponse({ stream });
+    return result.toUIMessageStreamResponse({
+      messageMetadata: ({ part }) => {
+        // Extract thread_id / run_id from raw provider chunks if available
+        if (part.type === 'raw') {
+          const raw = part.rawValue as any;
+          if (typeof raw === 'object' && (raw?.thread_id || raw?.run_id)) {
+            return {
+              thread_id: raw?.thread_id,
+              run_id: raw?.run_id,
+            };
+          }
+        }
+        // Fallback: Send a threadId in 'start' part to ensure there will always be one.
+        // NOTE: AI-SDK would merge all messageMetadata automatically and use latest result to overwrite
+        // previous results, so if server returns thread_id later, it would get prioritized.
+        if (part.type === 'start') {
+          return {
+            thread_id: reqThreadId || crypto.randomUUID(),
+          };
+        }
+
+        return {};
+      },
+    });
   } catch (err) {
     console.error('[api/chat] fatal', { requestId, err });
     return new Response(
