@@ -1,3 +1,11 @@
+## [1.8.0] (2026-01-04)
+
+
+### Features
+
+* **chat**: integrate custom chat backend via `/v1/chat/completions`
+* **chat**: support switching between OpenAI and custom backend using `USE_CUSTOM_CHAT_API` and `CHAT_API_BASE_URL` environment variables
+
 ## [1.7.7](https://github.com/ixartz/SaaS-Boilerplate/compare/v1.7.6...v1.7.7) (2025-12-12)
 
 

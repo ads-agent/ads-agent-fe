@@ -27,6 +27,7 @@ export default antfu({
     'next-env.d.ts',
     'src/components/assistant-ui/**/*',
     'src/components/ui/**/*',
+    '*.md',
   ],
 }, ...tailwind.configs['flat/recommended'], jsxA11y.flatConfigs.recommended, {
   plugins: {

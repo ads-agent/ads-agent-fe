@@ -1,5 +1,6 @@
 // src/app/api/chat/route.ts
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI, openai } from '@ai-sdk/openai';
+import { auth } from '@clerk/nextjs/server';
 import {
   convertToModelMessages,
   createUIMessageStream,
@@ -7,6 +8,8 @@ import {
   streamText,
 } from 'ai';
 import { z } from 'zod';
+
+import { Env } from '@/libs/Env';
 
 export const runtime = 'nodejs';
 
@@ -33,14 +36,54 @@ export async function POST(req: Request) {
 
     const { messages, system, threadId } = parsed.data;
 
-    const modelName = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+    // Determine which provider to use based on environment configuration
+    let model;
+
+    if (Env.USE_CUSTOM_CHAT_API === 'true' && Env.CHAT_API_BASE_URL) {
+      // Use the custom Chat Server
+      const { getToken } = await auth();
+      const token = await getToken();
+
+      const customOpenAI = createOpenAI({
+        baseURL: Env.CHAT_API_BASE_URL,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        // Custom fetch to inject thread_id into the body for persistence
+        fetch: async (url, options) => {
+          let body;
+          try {
+            body = options?.body ? JSON.parse(options.body as string) : {};
+          } catch {
+            body = {};
+          }
+
+          if (threadId) {
+            body.thread_id = threadId;
+          }
+
+          return fetch(url, {
+            ...options,
+            body: JSON.stringify(body),
+          });
+        },
+      });
+
+      // Use the specific model for the custom server
+      model = customOpenAI.chat('gemini-2.5-flash-lite');
+    } else {
+      // Fallback to direct OpenAI API usage
+      const modelName = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+      model = openai(modelName);
+    }
+
     const modelMessages = await convertToModelMessages(messages);
 
     const stream = createUIMessageStream({
       async execute({ writer }) {
         try {
           const result = streamText({
-            model: openai(modelName),
+            model,
             system: system ?? 'You are a helpful assistant. Be concise unless the user asks for details.',
             messages: modelMessages,
             temperature: 0.2,
