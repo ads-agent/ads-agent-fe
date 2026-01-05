@@ -5,6 +5,11 @@
 
 * **chat**: integrate custom chat backend via `/v1/chat/completions`
 * **chat**: support switching between OpenAI and custom backend using `USE_CUSTOM_CHAT_API` and `CHAT_API_BASE_URL` environment variables
+* **chat-ui**: implement collapsible sidebar with logo and improved navigation
+* **chat-ui**: integrate Clerk `UserButton` in sidebar footer and reorganize dashboard/settings links
+* **chat-ui**: increase chat window maximum width for better readability on large screens
+* **chat-ui**: refine logo usage with `adbuddy_logo_small.png` and hover-to-expand behavior in collapsed sidebar
+* **chat-ui**: hide thread list in collapsed sidebar state for cleaner UI
 
 ## [1.7.7](https://github.com/ixartz/SaaS-Boilerplate/compare/v1.7.6...v1.7.7) (2025-12-12)
 

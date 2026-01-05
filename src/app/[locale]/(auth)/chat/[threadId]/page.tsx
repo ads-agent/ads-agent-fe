@@ -66,7 +66,7 @@ export default function ChatThreadPage() {
 
   return (
     <div className="flex size-full justify-center overflow-hidden">
-      <div className="flex size-full max-w-3xl flex-col">
+      <div className="flex size-full max-w-7xl flex-col">
         <AssistantRuntimeProvider runtime={runtime}>
           <ThreadPersistence threadId={threadId} />
           <RepoSaver threadId={threadId} />

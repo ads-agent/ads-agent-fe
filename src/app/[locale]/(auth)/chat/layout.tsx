@@ -1,10 +1,21 @@
 'use client';
 
+import { UserButton } from '@clerk/nextjs';
+import {
+  LayoutDashboard,
+  MessageSquare,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Plus,
+  Settings,
+  Trash2,
+} from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   createThread,
   deleteThread,
@@ -69,6 +80,8 @@ function getActiveThreadId(pathname: string | null) {
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isHeaderHovered, setIsHeaderHovered] = useState(false);
 
   const activeThreadId = getActiveThreadId(pathname);
 
@@ -128,47 +141,126 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         {/* Sidebar */}
         <aside
           className={[
-            'fixed left-0 top-0 z-50 h-screen w-72 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80',
-            'transform transition-transform md:translate-x-0',
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+            'fixed left-0 top-0 z-50 h-screen border-r bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/80',
+            isCollapsed ? 'md:w-16' : 'md:w-72',
+            sidebarOpen ? 'translate-x-0 w-72' : '-translate-x-full md:translate-x-0',
           ].join(' ')}
         >
           <div className="flex h-full flex-col">
             {/* Sidebar header */}
-            <div className="flex items-center justify-between p-3">
-              <div className="flex items-center gap-2">
-                <div className="size-8 rounded-lg border bg-muted" />
-                <div className="flex flex-col leading-tight">
-                  <span className="text-sm font-semibold">Your App</span>
-                  <span className="text-xs text-muted-foreground">Chat</span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="rounded-md border px-2 py-1 text-sm hover:bg-muted md:hidden"
-                onClick={() => setSidebarOpen(false)}
-                aria-label="Close sidebar"
-              >
-                ✕
-              </button>
+            <div
+              className="flex h-14 items-center justify-between p-3"
+              onMouseEnter={() => setIsHeaderHovered(true)}
+              onMouseLeave={() => setIsHeaderHovered(false)}
+            >
+              {!isCollapsed
+                ? (
+                    <>
+                      <div className="flex items-center gap-2 text-xl font-bold">
+                        <Image
+                          src="/assets/images/adbuddy_logo_small.png"
+                          alt="AdBuddy Logo"
+                          width={32}
+                          height={32}
+                          className="size-8 object-contain"
+                        />
+                        <span>AdBuddy.ai</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="rounded-md p-1.5 hover:bg-muted"
+                        onClick={() => setIsCollapsed(true)}
+                        aria-label="Collapse sidebar"
+                      >
+                        <PanelLeftClose size={20} />
+                      </button>
+                    </>
+                  )
+                : (
+                    <div className="flex w-full justify-center">
+                      <button
+                        type="button"
+                        className="flex size-10 items-center justify-center rounded-md hover:bg-muted"
+                        onClick={() => {
+                          if (window.innerWidth < 768) {
+                            setSidebarOpen(false);
+                          } else {
+                            setIsCollapsed(false);
+                          }
+                        }}
+                        aria-label="Expand sidebar"
+                      >
+                        {isHeaderHovered
+                          ? <PanelLeftOpen size={20} />
+                          : (
+                              <Image
+                                src="/assets/images/adbuddy_logo_small.png"
+                                alt="AdBuddy Logo"
+                                width={32}
+                                height={32}
+                                className="size-8 object-contain"
+                              />
+                            )}
+                      </button>
+                    </div>
+                  )}
             </div>
 
-            {/* New chat button */}
-            <div className="px-3 pb-3">
-              <button
-                type="button"
-                onClick={onNewChat}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border bg-background px-3 py-2 text-sm font-medium hover:bg-muted"
-              >
-                <span className="text-base">＋</span>
-                New chat
-              </button>
+            {/* Navigation buttons */}
+            <div className="space-y-1 px-3 pb-3">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={onNewChat}
+                    className={[
+                      'flex w-full items-center gap-2 rounded-lg border bg-background py-2 text-sm font-medium hover:bg-muted',
+                      isCollapsed ? 'justify-center px-0' : 'px-3',
+                    ].join(' ')}
+                  >
+                    <Plus size={18} />
+                    {!isCollapsed && <span>New chat</span>}
+                  </button>
+                </TooltipTrigger>
+                {isCollapsed && <TooltipContent side="right">New chat</TooltipContent>}
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href="/dashboard"
+                    className={[
+                      'flex items-center gap-2 rounded-lg py-2 text-sm hover:bg-muted',
+                      isCollapsed ? 'justify-center px-0' : 'px-3',
+                    ].join(' ')}
+                  >
+                    <LayoutDashboard size={18} />
+                    {!isCollapsed && <span>Dashboard</span>}
+                  </Link>
+                </TooltipTrigger>
+                {isCollapsed && <TooltipContent side="right">Dashboard</TooltipContent>}
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href="/settings"
+                    className={[
+                      'flex items-center gap-2 rounded-lg py-2 text-sm hover:bg-muted',
+                      isCollapsed ? 'justify-center px-0' : 'px-3',
+                    ].join(' ')}
+                  >
+                    <Settings size={18} />
+                    {!isCollapsed && <span>Settings</span>}
+                  </Link>
+                </TooltipTrigger>
+                {isCollapsed && <TooltipContent side="right">Settings</TooltipContent>}
+              </Tooltip>
             </div>
 
             {/* Threads list */}
             <div className="flex-1 overflow-y-auto px-2">
-              {groups.length === 0
+              {!isCollapsed && (groups.length === 0
                 ? (
                     <div className="px-3 py-2 text-sm text-muted-foreground">
                       No conversations yet.
@@ -177,76 +269,89 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                 : (
                     groups.map(g => (
                       <div key={g.label} className="mb-3">
-                        <div className="px-2 pb-2 text-xs font-medium text-muted-foreground">
-                          {g.label}
-                        </div>
+                        {!isCollapsed && (
+                          <div className="px-2 pb-2 text-xs font-medium text-muted-foreground">
+                            {g.label}
+                          </div>
+                        )}
 
                         <nav className="space-y-1">
                           {g.items.map((t) => {
                             const active = activeThreadId === t.id;
                             return (
-                              <div key={t.id} className="group flex items-center">
-                                <Link
-                                  href={`/chat/${t.id}`}
-                                  onClick={() => setSidebarOpen(false)}
-                                  className={[
-                                    'flex-1 truncate rounded-lg px-3 py-2 text-sm',
-                                    active ? 'bg-muted' : 'hover:bg-muted/70',
-                                  ].join(' ')}
-                                >
-                                  {t.title}
-                                </Link>
+                              <Tooltip key={t.id}>
+                                <TooltipTrigger asChild>
+                                  <div className="group flex items-center">
+                                    <Link
+                                      href={`/chat/${t.id}`}
+                                      onClick={() => setSidebarOpen(false)}
+                                      className={[
+                                        'flex flex-1 items-center gap-2 truncate rounded-lg py-2 text-sm',
+                                        active ? 'bg-muted' : 'hover:bg-muted/70',
+                                        isCollapsed ? 'justify-center px-0' : 'px-3',
+                                      ].join(' ')}
+                                    >
+                                      {isCollapsed ? <MessageSquare size={18} /> : t.title}
+                                    </Link>
 
-                                <button
-                                  type="button"
-                                  className="ml-1 rounded-md p-2 text-muted-foreground opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100"
-                                  aria-label="Delete thread"
-                                  onClick={() => onDeleteThread(t.id)}
-                                >
-                                  ⋯
-                                </button>
-                              </div>
+                                    {!isCollapsed && (
+                                      <button
+                                        type="button"
+                                        className="ml-1 rounded-md p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100"
+                                        aria-label="Delete thread"
+                                        onClick={() => onDeleteThread(t.id)}
+                                      >
+                                        <Trash2 size={14} />
+                                      </button>
+                                    )}
+                                  </div>
+                                </TooltipTrigger>
+                                {isCollapsed && <TooltipContent side="right">{t.title}</TooltipContent>}
+                              </Tooltip>
                             );
                           })}
                         </nav>
                       </div>
                     ))
-                  )}
+                  ))}
             </div>
-
             {/* Sidebar footer */}
             <div className="border-t p-3">
-              <div className="flex items-center gap-3 rounded-lg p-2 hover:bg-muted">
-                <div className="size-9 rounded-full border bg-muted" />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-medium">You</div>
-                  <div className="truncate text-xs text-muted-foreground">
-                    Settings • Billing • Logout
+              <div className={[
+                'flex items-center gap-3 rounded-lg p-1',
+                isCollapsed ? 'justify-center' : '',
+              ].join(' ')}
+              >
+                <UserButton
+                  userProfileMode="navigation"
+                  userProfileUrl="/dashboard/user-profile"
+                  appearance={{
+                    elements: {
+                      rootBox: 'flex items-center justify-center',
+                      userButtonAvatarBox: 'size-9',
+                    },
+                  }}
+                />
+                {!isCollapsed && (
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-medium">Account</div>
+                    <div className="truncate text-xs text-muted-foreground">
+                      Manage your profile
+                    </div>
                   </div>
-                </div>
-                <span className="text-muted-foreground">⌄</span>
-              </div>
-
-              <div className="mt-2 flex gap-2">
-                <Link
-                  href="/dashboard"
-                  className="flex-1 rounded-lg border px-3 py-2 text-center text-xs hover:bg-muted"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/settings"
-                  className="flex-1 rounded-lg border px-3 py-2 text-center text-xs hover:bg-muted"
-                >
-                  Settings
-                </Link>
+                )}
               </div>
             </div>
           </div>
         </aside>
 
         {/* Main column */}
-        <div className="flex h-screen flex-col md:pl-72">
+        <div
+          className={[
+            'flex h-screen flex-col transition-all duration-300',
+            isCollapsed ? 'md:pl-16' : 'md:pl-72',
+          ].join(' ')}
+        >
           {/* Top bar */}
           <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80">
             <button
