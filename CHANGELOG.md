@@ -3,6 +3,9 @@
 
 ### Features
 
+* **chat**: integrate Assistant Cloud for thread persistence and management
+* **chat**: refactor thread list UI to use `ThreadList` component for both custom and cloud backends
+* **chat**: add environment variables `NEXT_PUBLIC_ASSISTANT_BASE_URL` and `NEXT_PUBLIC_USE_CUSTOM_SERVER_FOR_THREAD_PERSISTENCE`
 * **chat**: refactor chat routing to use optional catch-all `[[...threadId]]` for better new thread handling
 * **chat**: implement server-side thread ID generation and metadata-driven URL updates without page reload
 * **api**: refactor chat route to support streaming metadata (thread ID, run ID) from custom backend
