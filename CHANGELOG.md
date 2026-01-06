@@ -1,3 +1,13 @@
+## [1.8.2] (2026-01-06)
+
+
+### Features
+
+* **chat**: implement bi-directional synchronization between URL and assistant thread state (deep linking)
+* **chat**: add collapsed display mode to `ThreadList` component for improved sidebar UX
+* **chat**: optimize thread switching logic with robust loading state handling and loop prevention
+* **chat**: improve new thread workflow by maintaining `/chat` URL for empty threads until first message
+
 ## [1.8.1] (2026-01-05)
 
 

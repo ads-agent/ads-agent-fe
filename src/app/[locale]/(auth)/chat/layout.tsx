@@ -6,7 +6,6 @@ import { useAuth, UserButton } from '@clerk/nextjs';
 import { AssistantCloud } from 'assistant-cloud';
 import {
   LayoutDashboard,
-  MessageSquare,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
@@ -366,19 +365,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
               {/* Threads list */}
               <div className="flex-1 overflow-y-auto px-2">
-                {!isCollapsed
-                  ? (
-                      <ThreadList />
-                    )
-                  : (
-                      // When collapsed, we can't easily show ThreadList unless we style it to be icons only.
-                      // For now, let's hide it or show a placeholder.
-                      // ThreadList component doesn't natively support "collapsed" icon-only mode easily without CSS overrides.
-                      // We'll hide it to keep UI clean as per previous design.
-                      <div className="flex justify-center p-2">
-                        <MessageSquare className="text-muted-foreground" size={20} />
-                      </div>
-                    )}
+                <ThreadList isCollapsed={isCollapsed} />
               </div>
 
               {/* Sidebar footer */}

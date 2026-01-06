@@ -1,6 +1,7 @@
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/utils/Helpers";
 import {
   AssistantIf,
   ThreadListItemPrimitive,
@@ -11,21 +12,34 @@ import { ArchiveIcon, PlusIcon } from "lucide-react";
 import type { FC } from "react";
 import { useRouter } from "next/navigation";
 
-export const ThreadList: FC = () => {
+interface ThreadListProps {
+  isCollapsed?: boolean;
+}
+
+export const ThreadList: FC<ThreadListProps> = ({ isCollapsed }) => {
   return (
-    <ThreadListPrimitive.Root className="aui-root aui-thread-list-root flex flex-col gap-1">
-      <ThreadListNew />
-      <AssistantIf condition={({ threads }) => threads.isLoading}>
-        <ThreadListSkeleton />
-      </AssistantIf>
-      <AssistantIf condition={({ threads }) => !threads.isLoading}>
-        <ThreadListPrimitive.Items components={{ ThreadListItem }} />
-      </AssistantIf>
+    <ThreadListPrimitive.Root
+      className={cn(
+        "aui-root aui-thread-list-root flex flex-col gap-1",
+        isCollapsed && "items-center",
+      )}
+    >
+      <ThreadListNew isCollapsed={isCollapsed} />
+      {!isCollapsed && (
+        <>
+          <AssistantIf condition={({ threads }) => threads.isLoading}>
+            <ThreadListSkeleton />
+          </AssistantIf>
+          <AssistantIf condition={({ threads }) => !threads.isLoading}>
+            <ThreadListPrimitive.Items components={{ ThreadListItem }} />
+          </AssistantIf>
+        </>
+      )}
     </ThreadListPrimitive.Root>
   );
 };
 
-const ThreadListNew: FC = () => {
+const ThreadListNew: FC<{ isCollapsed?: boolean }> = ({ isCollapsed }) => {
   const router = useRouter();
   const handleNewThreadClick = () => {
     // ThreadListItemPrimitive.New 会负责“切线程”，我们只负责改 URL
@@ -36,11 +50,16 @@ const ThreadListNew: FC = () => {
     <ThreadListPrimitive.New asChild>
       <Button
         variant="outline"
-        className="aui-thread-list-new h-9 justify-start gap-2 rounded-lg px-3 text-sm hover:bg-muted data-active:bg-muted"
+        className={cn(
+          "aui-thread-list-new h-9 hover:bg-muted data-active:bg-muted",
+          isCollapsed
+            ? "w-9 justify-center px-0"
+            : "w-full justify-start gap-2 rounded-lg px-3 text-sm",
+        )}
         onClick={handleNewThreadClick}
       >
         <PlusIcon className="size-4" />
-        New Thread
+        {!isCollapsed && "New Thread"}
       </Button>
     </ThreadListPrimitive.New>
   );
@@ -74,7 +93,8 @@ const ThreadListItem: FC = () => {
 
   return (
     <ThreadListItemPrimitive.Root className="aui-thread-list-item group flex h-9 items-center rounded-lg transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none data-active:bg-muted">
-      <ThreadListItemPrimitive.Trigger className="aui-thread-list-item-trigger flex h-full flex-1 items-center truncate px-3 text-start text-sm"
+      <ThreadListItemPrimitive.Trigger
+        className="aui-thread-list-item-trigger flex h-full flex-1 items-center truncate px-3 text-start text-sm"
         onClick={handleThreadItemClick}
       >
         <ThreadListItemPrimitive.Title fallback="New Chat" />
