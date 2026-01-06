@@ -3,6 +3,7 @@
 
 ### Features
 
+* **chat**: use Clerk for Assistant Cloud authentication
 * **chat**: integrate Assistant Cloud for thread persistence and management
 * **chat**: refactor thread list UI to use `ThreadList` component for both custom and cloud backends
 * **chat**: add environment variables `NEXT_PUBLIC_ASSISTANT_BASE_URL` and `NEXT_PUBLIC_USE_CUSTOM_SERVER_FOR_THREAD_PERSISTENCE`

@@ -2,7 +2,7 @@
 
 import { AssistantRuntimeProvider } from '@assistant-ui/react';
 import { AssistantChatTransport, useChatRuntime } from '@assistant-ui/react-ai-sdk';
-import { UserButton } from '@clerk/nextjs';
+import { useAuth, UserButton } from '@clerk/nextjs';
 import type { UIMessage } from 'ai';
 import { AssistantCloud } from 'assistant-cloud';
 import {
@@ -82,15 +82,21 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     threadIdRef.current = activeThreadId;
   }, [activeThreadId]);
 
+  const { getToken } = useAuth();
+
   const cloud = useMemo(() => {
     if (useCustom) {
       return undefined;
     }
     return new AssistantCloud({
       baseUrl: Env.NEXT_PUBLIC_ASSISTANT_BASE_URL!,
-      anonymous: true,
+      // anonymous: true,
+      authToken: async () => {
+        // 模板名要和 Clerk 中创建的一致
+        return await getToken({ template: 'assistant-ui-cloud' });
+      },
     });
-  }, [useCustom]);
+  }, [useCustom, getToken]);
 
   // Runtime Configuration
   const runtime = useChatRuntime({
