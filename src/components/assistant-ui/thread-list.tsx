@@ -5,9 +5,11 @@ import {
   AssistantIf,
   ThreadListItemPrimitive,
   ThreadListPrimitive,
+  useThreadListItem,
 } from "@assistant-ui/react";
 import { ArchiveIcon, PlusIcon } from "lucide-react";
 import type { FC } from "react";
+import { useRouter } from "next/navigation";
 
 export const ThreadList: FC = () => {
   return (
@@ -24,11 +26,18 @@ export const ThreadList: FC = () => {
 };
 
 const ThreadListNew: FC = () => {
+  const router = useRouter();
+  const handleNewThreadClick = () => {
+    // ThreadListItemPrimitive.New 会负责“切线程”，我们只负责改 URL
+    router.push(`/chat`);
+  };
+
   return (
     <ThreadListPrimitive.New asChild>
       <Button
         variant="outline"
         className="aui-thread-list-new h-9 justify-start gap-2 rounded-lg px-3 text-sm hover:bg-muted data-active:bg-muted"
+        onClick={handleNewThreadClick}
       >
         <PlusIcon className="size-4" />
         New Thread
@@ -55,9 +64,19 @@ const ThreadListSkeleton: FC = () => {
 };
 
 const ThreadListItem: FC = () => {
+  const router = useRouter();
+  // hook 里能拿到当前这个 item 的 threadId
+  const threadId = useThreadListItem((m) => m.threadId);
+  const handleThreadItemClick = () => {
+    // ThreadListItemPrimitive.Trigger 会负责“切线程”，我们只负责改 URL
+    router.push(`/chat/${threadId}`);
+  };
+
   return (
     <ThreadListItemPrimitive.Root className="aui-thread-list-item group flex h-9 items-center rounded-lg transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none data-active:bg-muted">
-      <ThreadListItemPrimitive.Trigger className="aui-thread-list-item-trigger flex h-full flex-1 items-center truncate px-3 text-start text-sm">
+      <ThreadListItemPrimitive.Trigger className="aui-thread-list-item-trigger flex h-full flex-1 items-center truncate px-3 text-start text-sm"
+        onClick={handleThreadItemClick}
+      >
         <ThreadListItemPrimitive.Title fallback="New Chat" />
       </ThreadListItemPrimitive.Trigger>
       <ThreadListItemArchive />

@@ -1,9 +1,8 @@
 'use client';
 
-import { AssistantRuntimeProvider } from '@assistant-ui/react';
+import { AssistantRuntimeProvider, useAssistantRuntime, useAssistantState } from '@assistant-ui/react';
 import { AssistantChatTransport, useChatRuntime } from '@assistant-ui/react-ai-sdk';
 import { useAuth, UserButton } from '@clerk/nextjs';
-import type { UIMessage } from 'ai';
 import { AssistantCloud } from 'assistant-cloud';
 import {
   LayoutDashboard,
@@ -21,34 +20,12 @@ import { z } from 'zod';
 
 import { ThreadList } from '@/components/assistant-ui/thread-list';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-  deriveTitleFromUserText,
-  listThreads,
-  upsertThread,
-} from '@/features/chat/thread-store';
 import { Env } from '@/libs/Env';
 
 const _MessageMetadataSchema = z.object({
   thread_id: z.string().optional(),
   run_id: z.string().optional(),
 });
-
-function getFirstUserText(messages: UIMessage[]) {
-  for (const m of messages) {
-    if (m.role !== 'user') {
-      continue;
-    }
-    for (const p of m.parts ?? []) {
-      if (p.type === 'text' && typeof (p as any).text === 'string') {
-        const t = (p as any).text.trim();
-        if (t) {
-          return t;
-        }
-      }
-    }
-  }
-  return null;
-}
 
 function getActiveThreadId(pathname: string | null) {
   if (!pathname) {
@@ -57,6 +34,93 @@ function getActiveThreadId(pathname: string | null) {
   const m = pathname.match(/\/chat\/([^/]+)/);
   return m?.[1] ?? null;
 }
+
+/* eslint-disable no-console */
+function ThreadSync() {
+  const runtime = useAssistantRuntime();
+  const pathname = usePathname();
+  // 订阅 thread list 的整体状态
+  const threadsState = useAssistantState(({ threads }) => threads);
+  const { mainThreadId, threadItems, isLoading } = threadsState;
+
+  const startedLoadingRef = useRef(false);
+  const finishedLoadingRef = useRef(false);
+  const isPopState = useRef(false);
+
+  useEffect(() => {
+    const handler = () => {
+      isPopState.current = true;
+    };
+    window.addEventListener('popstate', handler);
+    return () => window.removeEventListener('popstate', handler);
+  }, []);
+
+  // 1. URL -> Runtime (on navigation/load)
+  useEffect(() => {
+    let threadListFirstTimeLoaded = false;
+    if (isLoading) {
+      if (!startedLoadingRef.current) {
+        // 2. first time False -> True
+        console.log('[zhengc][order] 2. first time False -> True');
+        startedLoadingRef.current = true;
+      } else {
+        // 3. 7. not first time
+        console.log('[zhengc][order] 3. 7. not first time');
+      }
+    } else {
+      if (!startedLoadingRef.current) {
+        // 1. has not flipped to true before
+        console.log('[zhengc][order] 1. has not flipped to true before');
+      } else {
+        // 4. has been true before
+        console.log('[zhengc][order] 4. has been true before');
+        if (!finishedLoadingRef.current) {
+          // 5. first time False -> True -> False
+          console.log('[zhengc][order] 5. first time False -> True -> False');
+          finishedLoadingRef.current = true;
+          threadListFirstTimeLoaded = true;
+        } else {
+          // 6. 8. not first time
+          console.log('[zhengc][order] 6. 8. not first time');
+        }
+      }
+    }
+    if (threadListFirstTimeLoaded
+    // Not first time loaded, but navigation event
+      || (!threadListFirstTimeLoaded && finishedLoadingRef.current && isPopState.current)) {
+      console.log('[zhengc][order] switching thread');
+      if (isPopState.current) {
+        isPopState.current = false;
+      }
+
+      const urlThreadId = getActiveThreadId(pathname);
+      if (urlThreadId) {
+        const entry = Object.entries(threadItems).find(([, item]) => item.id === urlThreadId);
+        if (!entry) {
+          // 这里可以按需加：remoteId 找不到时 404 / 回退到 /chat
+          console.log('[zhengc][order] no thread found');
+          return;
+        }
+        // 切换到目标线程
+        runtime.switchToThread(urlThreadId);
+      } else {
+        if (!mainThreadId.startsWith('__LOCALID_')) {
+          const entry = Object.entries(threadItems).find(([, item]) => item.id.startsWith('__LOCALID_'));
+          if (!entry) {
+            // shouldn't reach
+            console.log('[zhengc][order] no EMPTY thread found');
+            return;
+          }
+          // 切换到目标线程
+          runtime.switchToThread(entry[1].id);
+        }
+      }
+    }
+  }, [isPopState, pathname, mainThreadId, threadItems, isLoading, runtime]);
+
+  return null;
+}
+/* eslint-enable no-console */
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -101,8 +165,8 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   // Runtime Configuration
   const runtime = useChatRuntime({
     cloud,
-    transport: useCustom
-      ? new AssistantChatTransport({
+    transport:
+      new AssistantChatTransport({
         api: '/api/chat',
         fetch: async (_input, init) => {
           let body;
@@ -112,8 +176,9 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
             body = {};
           }
 
-          if (threadIdRef.current) {
-            body.threadId = threadIdRef.current;
+          const urlThreadId = getActiveThreadId(window.location.pathname);
+          if (urlThreadId) {
+            body.threadId = urlThreadId;
           }
 
           // Use absolute URL to avoid locale-prefix 404s
@@ -138,59 +203,20 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
           return res;
         },
-      })
-      : undefined,
+      }),
     messageMetadataSchema: _MessageMetadataSchema,
-    onFinish: (message) => {
-      // Logic for updating URL and local thread sync if in Custom Mode
+    onFinish: (_message) => {
       try {
-        let isNewThread = false;
-        if (message?.message?.metadata) {
-          const metadata = message?.message?.metadata as z.infer<typeof _MessageMetadataSchema>;
-          const threadIdFromMetadata = metadata?.thread_id;
-          if (threadIdFromMetadata && threadIdFromMetadata !== activeThreadId) {
-            threadIdRef.current = threadIdFromMetadata;
-            setActiveThreadId(threadIdFromMetadata);
-
-            // Update URL without page reload/remount
-            const newPath = pathname.endsWith('/chat')
-              ? `${pathname}/${threadIdFromMetadata}`
-              : pathname.replace(/\/chat\/[^/]+/, `/chat/${threadIdFromMetadata}`);
-            window.history.replaceState({}, '', newPath);
-
-            if (useCustom) {
-              isNewThread = (listThreads().findIndex(t => t.id === threadIdFromMetadata) <= 0);
-            }
-          }
-        }
-
-        const currentId = threadIdRef.current;
-        if (!currentId) {
-          return;
-        }
-
-        // Only update local thread store if using Custom persistence (Placeholder logic)
-        if (useCustom) {
-          const titleText = getFirstUserText(message ? message.messages : []);
-          upsertThread({
-            id: currentId,
-            title: titleText ? deriveTitleFromUserText(titleText) : undefined,
-            updatedAt: Date.now(),
-          });
-
-          if (isNewThread) {
-            window.dispatchEvent(new StorageEvent('storage', { key: 'chat_threads_v1' }));
-          }
-        }
+        // Example of processing message metadata
+        // if (message?.message?.metadata) {
+        //   const metadata = message?.message?.metadata as z.infer<typeof _MessageMetadataSchema>;
+        // }
       } catch (e) {
         console.error('[chat] onFinish failed', e);
       }
     },
     onError: (e) => {
       console.error('[chat] runtime error', e);
-      if (useCustom && threadIdRef.current) {
-        upsertThread({ id: threadIdRef.current, updatedAt: Date.now() });
-      }
     },
   });
 
@@ -202,6 +228,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   return (
     <TooltipProvider delayDuration={150}>
       <AssistantRuntimeProvider runtime={runtime}>
+        <ThreadSync />
         <div className="h-screen w-full bg-background text-foreground">
           {/* Mobile overlay */}
           <div
