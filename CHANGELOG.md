@@ -3,6 +3,7 @@
 
 ### Features
 
+* **database**: migrate to Neon Serverless driver and `drizzle-orm/neon-serverless` adapter for production
 * **chat**: implement bi-directional synchronization between URL and assistant thread state (deep linking)
 * **chat**: add collapsed display mode to `ThreadList` component for improved sidebar UX
 * **chat**: optimize thread switching logic with robust loading state handling and loop prevention
