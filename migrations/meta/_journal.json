@@ -8,6 +8,13 @@
       "when": 1726784321202,
       "tag": "0000_init-db",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1767833906711,
+      "tag": "0001_illegal_violations",
+      "breakpoints": true
     }
   ]
 }

@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
+import { TokenBalance } from '@/features/billing/TokenBalance';
 import { Logo } from '@/templates/Logo';
 import { getI18nPath } from '@/utils/Helpers';
 
@@ -98,6 +99,10 @@ export const DashboardHeader = (props: {
 
           <li>
             <Separator orientation="vertical" className="h-4" />
+          </li>
+
+          <li>
+            <TokenBalance />
           </li>
 
           <li>

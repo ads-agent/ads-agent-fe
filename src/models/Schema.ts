@@ -1,5 +1,6 @@
 import {
   bigint,
+  integer,
   pgTable,
   serial,
   text,
@@ -45,6 +46,17 @@ export const organizationSchema = pgTable(
     };
   },
 );
+
+export const userSchema = pgTable('user', {
+  id: text('id').primaryKey(), // This will be the Clerk User ID
+  stripeCustomerId: text('stripe_customer_id'),
+  tokenBalance: integer('token_balance').notNull().default(0),
+  updatedAt: timestamp('updated_at', { mode: 'date' })
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
 
 export const todoSchema = pgTable('todo', {
   id: serial('id').primaryKey(),

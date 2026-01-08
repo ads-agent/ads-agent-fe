@@ -14,6 +14,11 @@ const intlMiddleware = createMiddleware({
   defaultLocale: AppConfig.defaultLocale,
 });
 
+const isPublicRoute = createRouteMatcher([
+  '/api/webhook/stripe',
+  '/:locale/api/webhook/stripe',
+]);
+
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
   '/:locale/dashboard(.*)',
@@ -34,7 +39,7 @@ export default function middleware(
   if (isApi) {
     return clerkMiddleware(async (auth, req) => {
       // 你已经把 /api(.*) 放进 isProtectedRoute 里了，因此这里会 protect
-      if (isProtectedRoute(req)) {
+      if (isProtectedRoute(req) && !isPublicRoute(req)) {
         // 对 API 来说，不需要构造 locale sign-in；直接给一个固定 sign-in 也可以
         // 如果你一定要保持 next-intl locale 依赖的 workaround，可以保留原逻辑
         await auth.protect({

@@ -1,3 +1,14 @@
+## [1.8.3] (2026-01-07)
+
+
+### Features
+
+* **billing**: integrate Stripe for one-off token purchases
+* **billing**: add `user` table to schema for tracking token balances
+* **billing**: implement `TokenPurchase` and `TokenBalance` components
+* **billing**: add Stripe webhook handler for `checkout.session.completed`
+* **api**: add endpoints for Stripe checkout and user token retrieval
+
 ## [1.8.2] (2026-01-06)
 
 

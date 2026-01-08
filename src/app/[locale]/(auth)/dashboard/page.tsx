@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 
+import { TokenPurchase } from '@/features/billing/TokenPurchase';
 import { MessageState } from '@/features/dashboard/MessageState';
 import { TitleBar } from '@/features/dashboard/TitleBar';
 import { SponsorLogos } from '@/features/sponsors/SponsorLogos';
@@ -13,6 +14,10 @@ const DashboardIndexPage = () => {
         title={t('title_bar')}
         description={t('title_bar_description')}
       />
+
+      <div className="mb-8 max-w-md">
+        <TokenPurchase />
+      </div>
 
       <MessageState
         icon={(
