@@ -26,6 +26,8 @@ const isProtectedRoute = createRouteMatcher([
   '/:locale/onboarding(.*)',
   '/api(.*)',
   '/:locale/api(.*)',
+  '/chat(.*)',
+  '/:locale/chat(.*)',
 ]);
 
 export default function middleware(
@@ -59,10 +61,12 @@ export default function middleware(
   ) {
     return clerkMiddleware(async (auth, req) => {
       if (isProtectedRoute(req)) {
-        const locale
-          = req.nextUrl.pathname.match(/(\/.*)\/dashboard/)?.at(1) ?? '';
+        const locale = AllLocales.find(
+          locale => req.nextUrl.pathname.startsWith(`/${locale}/`)
+            || req.nextUrl.pathname === `/${locale}`,
+        );
 
-        const signInUrl = new URL(`${locale}/sign-in`, req.url);
+        const signInUrl = new URL(`${locale ? `/${locale}` : ''}/sign-in`, req.url);
 
         await auth.protect({
           // `unauthenticatedUrl` is needed to avoid error: "Unable to find `next-intl` locale because the middleware didn't run on this request"

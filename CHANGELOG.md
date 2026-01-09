@@ -1,3 +1,10 @@
+## [1.8.4] (2026-01-09)
+
+
+### Features
+
+* **auth**: protect `/chat` route and improve locale extraction in middleware
+
 ## [1.8.3] (2026-01-07)
 
 
