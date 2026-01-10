@@ -1,3 +1,16 @@
+## [1.8.5] (2026-01-09)
+
+
+### Features
+
+* **chat-ui**: implement custom `UserMenu` and `SettingsModal` to replace Clerk's default user button
+* **chat-ui**: add unified settings modal with General (theme/language), Account (profile/billing), and Usage (history) tabs
+* **chat-ui**: redesign sidebar footer with unified Avatar/Token-Balance pill and Blog navigation
+* **chat-ui**: optimize sidebar navigation by replacing Dashboard/Settings with a Search placeholder
+* **chat-ui**: improve overlay UX by resolving pointer-event conflicts between dropdown menus and dialogs
+* **chat-ui**: remove redundant "..." action from the chat header
+* **billing**: integrate `TokenPurchase` into the settings modal with deep linking from usage history
+
 ## [1.8.4] (2026-01-09)
 
 

@@ -2,23 +2,22 @@
 
 import { AssistantRuntimeProvider, useAssistantRuntime, useAssistantState } from '@assistant-ui/react';
 import { AssistantChatTransport, useChatRuntime } from '@assistant-ui/react-ai-sdk';
-import { useAuth, UserButton } from '@clerk/nextjs';
+import { useAuth } from '@clerk/nextjs';
 import { AssistantCloud } from 'assistant-cloud';
 import {
-  LayoutDashboard,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
-  Settings,
+  Search,
 } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 
 import { ThreadList } from '@/components/assistant-ui/thread-list';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { UserMenu } from '@/features/chat/UserMenu';
 import { Env } from '@/libs/Env';
 
 const _MessageMetadataSchema = z.object({
@@ -332,34 +331,18 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Link
-                      href="/dashboard"
+                    <button
+                      type="button"
                       className={[
-                        'flex items-center gap-2 rounded-lg py-2 text-sm hover:bg-muted',
+                        'flex items-center gap-2 rounded-lg py-2 text-sm hover:bg-muted w-full',
                         isCollapsed ? 'justify-center px-0' : 'px-3',
                       ].join(' ')}
                     >
-                      <LayoutDashboard size={18} />
-                      {!isCollapsed && <span>Dashboard</span>}
-                    </Link>
+                      <Search size={18} />
+                      {!isCollapsed && <span>Search</span>}
+                    </button>
                   </TooltipTrigger>
-                  {isCollapsed && <TooltipContent side="right">Dashboard</TooltipContent>}
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href="/settings"
-                      className={[
-                        'flex items-center gap-2 rounded-lg py-2 text-sm hover:bg-muted',
-                        isCollapsed ? 'justify-center px-0' : 'px-3',
-                      ].join(' ')}
-                    >
-                      <Settings size={18} />
-                      {!isCollapsed && <span>Settings</span>}
-                    </Link>
-                  </TooltipTrigger>
-                  {isCollapsed && <TooltipContent side="right">Settings</TooltipContent>}
+                  {isCollapsed && <TooltipContent side="right">Search</TooltipContent>}
                 </Tooltip>
               </div>
 
@@ -370,30 +353,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
               {/* Sidebar footer */}
               <div className="border-t p-3">
-                <div className={[
-                  'flex items-center gap-3 rounded-lg p-1',
-                  isCollapsed ? 'justify-center' : '',
-                ].join(' ')}
-                >
-                  <UserButton
-                    userProfileMode="navigation"
-                    userProfileUrl="/dashboard/user-profile"
-                    appearance={{
-                      elements: {
-                        rootBox: 'flex items-center justify-center',
-                        userButtonAvatarBox: 'size-9',
-                      },
-                    }}
-                  />
-                  {!isCollapsed && (
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium">Account</div>
-                      <div className="truncate text-xs text-muted-foreground">
-                        Manage your profile
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <UserMenu isCollapsed={isCollapsed} />
               </div>
             </div>
           </aside>
@@ -426,12 +386,6 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                   className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
                 >
                   Share
-                </button>
-                <button
-                  type="button"
-                  className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
-                >
-                  ⋯
                 </button>
               </div>
             </header>
