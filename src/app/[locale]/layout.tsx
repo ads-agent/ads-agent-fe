@@ -8,26 +8,19 @@ import { unstable_setRequestLocale } from 'next-intl/server';
 import { AllLocales } from '@/utils/AppConfig';
 
 export const metadata: Metadata = {
+  title: {
+    default: 'AdBuddy - Turning Diagnosis Into Direction',
+    template: '%s | AdBuddy',
+  },
   icons: [
     {
       rel: 'apple-touch-icon',
-      url: '/apple-touch-icon.png',
+      url: '/assets/images/adbuddy_logo_small.png',
     },
     {
       rel: 'icon',
       type: 'image/png',
-      sizes: '32x32',
-      url: '/favicon-32x32.png',
-    },
-    {
-      rel: 'icon',
-      type: 'image/png',
-      sizes: '16x16',
-      url: '/favicon-16x16.png',
-    },
-    {
-      rel: 'icon',
-      url: '/favicon.ico',
+      url: '/assets/images/adbuddy_logo_small.png',
     },
   ],
 };
