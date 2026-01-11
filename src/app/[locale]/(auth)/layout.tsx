@@ -3,6 +3,7 @@
 import { enUS, frFR } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
 
+import { UserThemeSync } from '@/components/UserThemeSync';
 import { AppConfig } from '@/utils/AppConfig';
 
 export default function AuthLayout(props: {
@@ -38,6 +39,7 @@ export default function AuthLayout(props: {
       signUpFallbackRedirectUrl={chatUrl}
       afterSignOutUrl={afterSignOutUrl}
     >
+      <UserThemeSync />
       {props.children}
     </ClerkProvider>
   );

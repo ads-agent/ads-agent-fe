@@ -1,3 +1,12 @@
+## [1.8.7] (2026-01-11)
+
+
+### Features
+
+* **chat-ui**: implement persistent dark mode support with per-user `localStorage` synchronization
+* **chat-ui**: add `ThemeProvider` for global shadcn/ui dark mode support
+* **chat-ui**: add `UserThemeSync` component to persist theme preferences across sessions for authenticated users
+
 ## [1.8.6] (2026-01-10)
 
 
