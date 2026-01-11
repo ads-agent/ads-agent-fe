@@ -36,8 +36,8 @@ export async function POST(req: Request) {
         },
       ],
       mode: 'payment',
-      success_url: `${baseUrl}/dashboard?payment=success`,
-      cancel_url: `${baseUrl}/dashboard?payment=cancelled`,
+      success_url: `${baseUrl}/chat?payment=success`,
+      cancel_url: `${baseUrl}/chat?payment=cancelled`,
       metadata: {
         userId,
       },

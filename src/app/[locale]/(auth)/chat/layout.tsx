@@ -5,6 +5,7 @@ import { AssistantChatTransport, useChatRuntime } from '@assistant-ui/react-ai-s
 import { useAuth } from '@clerk/nextjs';
 import { AssistantCloud } from 'assistant-cloud';
 import {
+  Loader2,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
@@ -120,7 +121,7 @@ function ThreadSync() {
 }
 /* eslint-enable no-console */
 
-export default function ChatLayout({ children }: { children: React.ReactNode }) {
+function ChatLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -144,10 +145,10 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
     threadIdRef.current = activeThreadId;
   }, [activeThreadId]);
 
-  const { getToken } = useAuth();
+  const { getToken, isLoaded, isSignedIn } = useAuth();
 
   const cloud = useMemo(() => {
-    if (useCustom) {
+    if (useCustom || !isLoaded || !isSignedIn) {
       return undefined;
     }
     return new AssistantCloud({
@@ -158,7 +159,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
         return await getToken({ template: 'assistant-ui-cloud' });
       },
     });
-  }, [useCustom, getToken]);
+  }, [useCustom, getToken, isLoaded, isSignedIn]);
 
   // Runtime Configuration
   const runtime = useChatRuntime({
@@ -397,4 +398,16 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
       </AssistantRuntimeProvider>
     </TooltipProvider>
   );
+}
+
+export default function ChatLayout({ children }: { children: React.ReactNode }) {
+  const { isLoaded } = useAuth();
+  if (!isLoaded) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <Loader2 className="size-10 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+  return <ChatLayoutContent>{children}</ChatLayoutContent>;
 }

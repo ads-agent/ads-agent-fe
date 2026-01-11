@@ -1,3 +1,12 @@
+## [1.8.6] (2026-01-10)
+
+
+### Features
+
+* **chat**: fix `AssistantCloud` initialization by guarding `ChatLayout` with `isLoaded` auth state and adding a loading spinner
+* **auth**: update post-login and post-signup redirects to default to `/chat` instead of `/dashboard`
+* **billing**: redirect to `/chat` instead of `/dashboard` after successful or cancelled Stripe payments
+
 ## [1.8.5] (2026-01-09)
 
 
