@@ -9,6 +9,7 @@ import {
   useThreadListItem,
 } from "@assistant-ui/react";
 import { ArchiveIcon, PlusIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { FC } from "react";
 import { useRouter } from "next/navigation";
 
@@ -40,6 +41,7 @@ export const ThreadList: FC<ThreadListProps> = ({ isCollapsed }) => {
 };
 
 const ThreadListNew: FC<{ isCollapsed?: boolean }> = ({ isCollapsed }) => {
+  const t = useTranslations("Chat");
   const router = useRouter();
   const handleNewThreadClick = () => {
     // ThreadListItemPrimitive.New 会负责“切线程”，我们只负责改 URL
@@ -59,7 +61,7 @@ const ThreadListNew: FC<{ isCollapsed?: boolean }> = ({ isCollapsed }) => {
         onClick={handleNewThreadClick}
       >
         <PlusIcon className="size-4" />
-        {!isCollapsed && "New Thread"}
+        {!isCollapsed && t("new_thread")}
       </Button>
     </ThreadListPrimitive.New>
   );
@@ -83,6 +85,7 @@ const ThreadListSkeleton: FC = () => {
 };
 
 const ThreadListItem: FC = () => {
+  const t = useTranslations("Chat");
   const router = useRouter();
   // hook 里能拿到当前这个 item 的 threadId
   const threadId = useThreadListItem((m) => m.threadId);
@@ -97,7 +100,7 @@ const ThreadListItem: FC = () => {
         className="aui-thread-list-item-trigger flex h-full flex-1 items-center truncate px-3 text-start text-sm"
         onClick={handleThreadItemClick}
       >
-        <ThreadListItemPrimitive.Title fallback="New Chat" />
+        <ThreadListItemPrimitive.Title fallback={t("new_chat_fallback")} />
       </ThreadListItemPrimitive.Trigger>
       <ThreadListItemArchive />
     </ThreadListItemPrimitive.Root>
@@ -105,11 +108,12 @@ const ThreadListItem: FC = () => {
 };
 
 const ThreadListItemArchive: FC = () => {
+  const t = useTranslations("Chat");
   return (
     <ThreadListItemPrimitive.Archive asChild>
       <TooltipIconButton
         variant="ghost"
-        tooltip="Archive thread"
+        tooltip={t("archive_thread")}
         className="aui-thread-list-item-archive mr-2 size-7 p-0 opacity-0 transition-opacity group-hover:opacity-100"
       >
         <ArchiveIcon className="size-4" />

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Env } from '@/libs/Env';
 
 export const TokenPurchase = () => {
+  const t = useTranslations('Chat');
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,12 +41,12 @@ export const TokenPurchase = () => {
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border bg-card p-4 text-card-foreground shadow-sm">
-      <h3 className="text-lg font-bold">Purchase Tokens</h3>
+      <h3 className="text-lg font-bold">{t('token_purchase_title')}</h3>
       <p className="text-sm text-muted-foreground">
-        Enter the number of token packs you want to purchase. Each pack contains 100 tokens.
+        {t('token_purchase_description')}
       </p>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="quantity">Quantity</Label>
+        <Label htmlFor="quantity">{t('token_purchase_quantity')}</Label>
         <Input
           id="quantity"
           type="number"
@@ -55,7 +57,7 @@ export const TokenPurchase = () => {
         />
       </div>
       <Button onClick={onPurchase} disabled={isLoading}>
-        {isLoading ? 'Redirecting...' : 'Buy Tokens'}
+        {isLoading ? t('token_purchase_redirecting') : t('token_purchase_button')}
       </Button>
     </div>
   );

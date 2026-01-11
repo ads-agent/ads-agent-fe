@@ -1,7 +1,7 @@
 import { useClerk, useUser } from '@clerk/nextjs';
 import { clsx } from 'clsx';
 import { Coins, LogOut, Settings as SettingsIcon, User } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
@@ -34,6 +34,7 @@ const MOCK_USAGE_DATA = [
 
 // Separating content to handle state
 const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, setTheme, locale, handleLocaleChange, tokenBalance, appConfig }: any) => {
+  const t = useTranslations('Chat');
   const [activeTab, setActiveTab] = useState(defaultTab);
 
   // Sync if prop changes (e.g. re-opening with different intent)
@@ -42,15 +43,15 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
   }, [defaultTab]);
 
   const tabs = [
-    { id: 'general', label: 'General', icon: SettingsIcon },
-    { id: 'account', label: 'Account', icon: User },
-    { id: 'usage', label: 'Usage', icon: Coins },
+    { id: 'general', label: t('settings_tab_general'), icon: SettingsIcon },
+    { id: 'account', label: t('settings_tab_account'), icon: User },
+    { id: 'usage', label: t('settings_tab_usage'), icon: Coins },
   ];
 
   return (
     <div className="flex size-full">
       <aside className="flex w-64 flex-col gap-1 border-r bg-muted/10 p-2">
-        <div className="p-4 text-lg font-semibold">Settings</div>
+        <div className="p-4 text-lg font-semibold">{t('settings_title')}</div>
         {tabs.map(tab => (
           <button
             type="button"
@@ -70,14 +71,14 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
         {activeTab === 'general' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium">General</h3>
-              <p className="text-sm text-muted-foreground">Manage your interface preferences.</p>
+              <h3 className="text-lg font-medium">{t('settings_general_title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('settings_general_description')}</p>
             </div>
             <Separator />
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium">Dark Mode</span>
-                <span className="text-xs text-muted-foreground">Switch between light and dark themes.</span>
+                <span className="text-sm font-medium">{t('settings_dark_mode')}</span>
+                <span className="text-xs text-muted-foreground">{t('settings_dark_mode_description')}</span>
               </div>
               <Switch
                 checked={theme === 'dark'}
@@ -87,8 +88,8 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
             <Separator />
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium">Language</span>
-                <span className="text-xs text-muted-foreground">Select your preferred language.</span>
+                <span className="text-sm font-medium">{t('settings_language')}</span>
+                <span className="text-xs text-muted-foreground">{t('settings_language_description')}</span>
               </div>
               <div className="flex gap-2">
                 {appConfig.locales.map((l: any) => (
@@ -109,8 +110,8 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
         {activeTab === 'account' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium">Account</h3>
-              <p className="text-sm text-muted-foreground">Manage your account settings.</p>
+              <h3 className="text-lg font-medium">{t('settings_account_title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('settings_account_description')}</p>
             </div>
             <Separator />
             <div className="flex items-center gap-4">
@@ -125,20 +126,20 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
             </div>
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => openUserProfile()}>
-                Manage Account
+                {t('settings_manage_account')}
               </Button>
               <Button variant="destructive" onClick={() => signOut()}>
                 <LogOut className="mr-2 size-4" />
-                Log Out
+                {t('settings_logout')}
               </Button>
             </div>
             <Separator />
             <div>
-              <h4 className="mb-2 text-sm font-medium">Token Balance</h4>
+              <h4 className="mb-2 text-sm font-medium">{t('settings_token_balance')}</h4>
               <div className="flex items-center gap-2 rounded-lg border p-3">
                 <Coins className="size-5 text-yellow-500" />
                 <span className="text-xl font-bold">{tokenBalance ?? '...'}</span>
-                <span className="text-sm text-muted-foreground">credits available</span>
+                <span className="text-sm text-muted-foreground">{t('settings_credits_available')}</span>
               </div>
             </div>
             <Separator />
@@ -149,15 +150,15 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
         {activeTab === 'usage' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-medium">Usage</h3>
-              <p className="text-sm text-muted-foreground">View your token usage history.</p>
+              <h3 className="text-lg font-medium">{t('settings_usage_title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('settings_usage_description')}</p>
             </div>
             <Separator />
             <div className="flex items-center justify-between rounded-lg bg-muted/50 p-4">
               <div className="flex items-center gap-2">
                 <Coins className="size-6 text-yellow-500" />
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Current Balance</div>
+                  <div className="text-sm font-medium text-muted-foreground">{t('settings_current_balance')}</div>
                   <div className="text-2xl font-bold">
                     {tokenBalance ?? '...'}
                     {' '}
@@ -165,15 +166,15 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
                   </div>
                 </div>
               </div>
-              <Button onClick={() => setActiveTab('account')}>Buy Tokens</Button>
+              <Button onClick={() => setActiveTab('account')}>{t('settings_buy_tokens')}</Button>
             </div>
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Usage</TableHead>
+                    <TableHead>{t('settings_usage_table_title')}</TableHead>
+                    <TableHead>{t('settings_usage_table_date')}</TableHead>
+                    <TableHead className="text-right">{t('settings_usage_table_usage')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

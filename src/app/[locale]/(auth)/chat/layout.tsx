@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 
@@ -122,6 +123,7 @@ function ThreadSync() {
 /* eslint-enable no-console */
 
 function ChatLayoutContent({ children }: { children: React.ReactNode }) {
+  const t = useTranslations('Chat');
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -271,7 +273,7 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                           type="button"
                           className="rounded-md p-1.5 hover:bg-muted"
                           onClick={() => setIsCollapsed(true)}
-                          aria-label="Collapse sidebar"
+                          aria-label={t('sidebar_collapse')}
                         >
                           <PanelLeftClose size={20} />
                         </button>
@@ -289,7 +291,7 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                               setIsCollapsed(false);
                             }
                           }}
-                          aria-label="Expand sidebar"
+                          aria-label={t('sidebar_expand')}
                         >
                           {isHeaderHovered
                             ? <PanelLeftOpen size={20} />
@@ -323,10 +325,10 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                         ].join(' ')}
                       >
                         <Plus size={18} />
-                        {!isCollapsed && <span>New chat</span>}
+                        {!isCollapsed && <span>{t('new_chat')}</span>}
                       </button>
                     </TooltipTrigger>
-                    {isCollapsed && <TooltipContent side="right">New chat</TooltipContent>}
+                    {isCollapsed && <TooltipContent side="right">{t('new_chat')}</TooltipContent>}
                   </Tooltip>
                 )}
 
@@ -340,10 +342,10 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                       ].join(' ')}
                     >
                       <Search size={18} />
-                      {!isCollapsed && <span>Search</span>}
+                      {!isCollapsed && <span>{t('search')}</span>}
                     </button>
                   </TooltipTrigger>
-                  {isCollapsed && <TooltipContent side="right">Search</TooltipContent>}
+                  {isCollapsed && <TooltipContent side="right">{t('search')}</TooltipContent>}
                 </Tooltip>
               </div>
 
@@ -372,13 +374,13 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                 type="button"
                 className="rounded-md border px-2 py-1 text-sm hover:bg-muted md:hidden"
                 onClick={() => setSidebarOpen(true)}
-                aria-label="Open sidebar"
+                aria-label={t('sidebar_open')}
               >
                 ☰
               </button>
 
               <div className="flex min-w-0 flex-1 items-center gap-2">
-                <span className="text-sm font-semibold">Chat</span>
+                <span className="text-sm font-semibold">{t('chat_header')}</span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -386,7 +388,7 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                   type="button"
                   className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
                 >
-                  Share
+                  {t('share')}
                 </button>
               </div>
             </header>

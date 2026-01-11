@@ -1,3 +1,13 @@
+## [1.8.8] (2026-01-11)
+
+
+### Features
+
+* **i18n**: replace French locale with Chinese (`zh`) support across the application
+* **i18n**: implement full multi-locale support for the `/chat` interface, including sidebar, header, tooltips, and thread list
+* **i18n**: localize `UserMenu`, `SettingsModal`, and `TokenPurchase` components
+* **i18n**: integrate Clerk `zhCN` localization for the `UserProfile` modal
+
 ## [1.8.7] (2026-01-11)
 
 

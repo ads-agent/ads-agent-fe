@@ -1,5 +1,6 @@
 import { useUser } from '@clerk/nextjs';
 import { BookOpen, ChevronRight, Coins, HelpCircle, LogOut, Settings } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,6 +30,7 @@ const UserDropdownContent = ({
   tokenBalance: number | null;
   openSettings: (tab: SettingsTab) => void;
 }) => {
+  const t = useTranslations('Chat');
   return (
     <DropdownMenuContent align="start" className="w-72 p-2" side="top">
       <div className="mb-3 overflow-hidden rounded-xl border bg-muted/30">
@@ -68,7 +70,7 @@ const UserDropdownContent = ({
         >
           <div className="flex items-center gap-2">
             <Coins className="size-4 text-yellow-500" />
-            <span className="text-sm font-medium">Token Balance</span>
+            <span className="text-sm font-medium">{t('user_menu_token_balance')}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold text-foreground">{tokenBalance ?? '...'}</span>
@@ -81,24 +83,25 @@ const UserDropdownContent = ({
 
       <DropdownMenuItem onClick={() => openSettings('general')} className="py-3 text-base">
         <Settings className="mr-3 size-5" />
-        <span>Settings</span>
+        <span>{t('user_menu_settings')}</span>
       </DropdownMenuItem>
       <DropdownMenuItem asChild className="py-3 text-base">
         <a href="/help" target="_blank" rel="noopener noreferrer">
           <HelpCircle className="mr-3 size-5" />
-          <span>Help</span>
+          <span>{t('user_menu_help')}</span>
         </a>
       </DropdownMenuItem>
       <DropdownMenuSeparator />
       <DropdownMenuItem onClick={() => openSettings('account')} className="py-3 text-base text-red-600 focus:bg-red-50 focus:text-red-600">
         <LogOut className="mr-3 size-5" />
-        <span>Log out</span>
+        <span>{t('user_menu_logout')}</span>
       </DropdownMenuItem>
     </DropdownMenuContent>
   );
 };
 
 export const UserMenu = ({ isCollapsed }: UserMenuProps) => {
+  const t = useTranslations('Chat');
   const { user } = useUser();
   const [tokenBalance, setTokenBalance] = useState<number | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -203,12 +206,12 @@ export const UserMenu = ({ isCollapsed }: UserMenuProps) => {
               className="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Blog"
+              aria-label={t('user_menu_blog')}
             >
               <BookOpen className="size-4" />
             </a>
           </TooltipTrigger>
-          <TooltipContent>Blog</TooltipContent>
+          <TooltipContent>{t('user_menu_blog')}</TooltipContent>
         </Tooltip>
       </div>
 

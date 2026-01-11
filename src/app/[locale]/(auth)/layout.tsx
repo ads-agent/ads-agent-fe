@@ -1,6 +1,6 @@
 'use client';
 
-import { enUS, frFR } from '@clerk/localizations';
+import { enUS, zhCN } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
 
 import { UserThemeSync } from '@/components/UserThemeSync';
@@ -17,8 +17,8 @@ export default function AuthLayout(props: {
   let chatUrl = '/chat';
   let afterSignOutUrl = '/';
 
-  if (props.params.locale === 'fr') {
-    clerkLocale = frFR;
+  if (props.params.locale === 'zh') {
+    clerkLocale = zhCN;
   }
 
   if (props.params.locale !== AppConfig.defaultLocale) {
