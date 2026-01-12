@@ -11,7 +11,8 @@ export const TokenBalance = () => {
       try {
         const response = await fetch('/api/user/tokens');
         const data = await response.json();
-        setBalance(data.tokenBalance);
+        const balance = data.tokenBalance;
+        setBalance(balance < 0 ? 0 : balance);
       } catch (error) {
         console.error('Failed to fetch token balance', error);
       }

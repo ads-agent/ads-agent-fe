@@ -5,9 +5,12 @@ import {
   convertToModelMessages,
   streamText,
 } from 'ai';
+import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
+import { db } from '@/libs/DB';
 import { Env } from '@/libs/Env';
+import { tokenUsageSchema, userSchema } from '@/models/Schema';
 
 export const runtime = 'nodejs';
 
@@ -83,6 +86,40 @@ export async function POST(req: Request) {
       messages: modelMessages,
       temperature: 0.2,
       includeRawChunks: true, // Enable raw chunks to capture provider-specific data
+      onChunk: ({ chunk }) => {
+        if (chunk.type === 'raw') {
+          // console.log('[api/chat] Raw chunk from backend:', chunk.rawValue);
+        }
+      },
+      onFinish: async ({ usage, text }) => {
+        const { userId } = await auth();
+        if (!userId || !usage) {
+          return;
+        }
+
+        try {
+          // Record token usage
+          await db.insert(tokenUsageSchema).values({
+            userId,
+            threadId: reqThreadId,
+            promptTokens: usage.inputTokens ?? 0,
+            completionTokens: usage.outputTokens ?? 0,
+            totalTokens: usage.totalTokens ?? 0,
+            model: model.modelId,
+            description: text.slice(0, 100), // Store a snippet as description
+          });
+
+          // Reduce user token balance
+          await db
+            .update(userSchema)
+            .set({
+              tokenBalance: sql`${userSchema.tokenBalance} - ${usage.totalTokens ?? 0}`,
+            })
+            .where(eq(userSchema.id, userId));
+        } catch (dbErr) {
+          console.error('[api/chat] failed to record usage', { requestId, dbErr });
+        }
+      },
     });
 
     return result.toUIMessageStreamResponse({

@@ -1,3 +1,4 @@
+import { useAssistantState } from '@assistant-ui/react';
 import { useClerk, useUser } from '@clerk/nextjs';
 import { clsx } from 'clsx';
 import { Coins, LogOut, Settings as SettingsIcon, User } from 'lucide-react';
@@ -23,24 +24,38 @@ type SettingsModalProps = {
   defaultTab?: SettingsTab;
 };
 
-// Mock Data for Usage Table
-const MOCK_USAGE_DATA = [
-  { id: 1, title: 'Chat Session - Project Alpha', date: '2025-01-08', tokens: 150 },
-  { id: 2, title: 'Code Analysis - Login Bug', date: '2025-01-08', tokens: 320 },
-  { id: 3, title: 'Image Generation - Logo', date: '2025-01-07', tokens: 50 },
-  { id: 4, title: 'Translation - FR to EN', date: '2025-01-06', tokens: 80 },
-  { id: 5, title: 'Chat Session - General', date: '2025-01-05', tokens: 120 },
-];
-
 // Separating content to handle state
 const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, setTheme, locale, handleLocaleChange, tokenBalance, appConfig }: any) => {
   const t = useTranslations('Chat');
   const [activeTab, setActiveTab] = useState(defaultTab);
+  const [usageHistory, setUsageHistory] = useState<any[]>([]);
+  const [loadingUsage, setLoadingUsage] = useState(false);
+
+  // Get thread list from assistant-ui state
+  const threadItems = useAssistantState(({ threads }) => threads.threadItems);
 
   // Sync if prop changes (e.g. re-opening with different intent)
   useEffect(() => {
     setActiveTab(defaultTab);
   }, [defaultTab]);
+
+  useEffect(() => {
+    if (activeTab === 'usage') {
+      const fetchUsage = async () => {
+        setLoadingUsage(true);
+        try {
+          const response = await fetch('/api/user/usage');
+          const data = await response.json();
+          setUsageHistory(data);
+        } catch (error) {
+          console.error('Failed to fetch usage history', error);
+        } finally {
+          setLoadingUsage(false);
+        }
+      };
+      fetchUsage();
+    }
+  }, [activeTab]);
 
   const tabs = [
     { id: 'general', label: t('settings_tab_general'), icon: SettingsIcon },
@@ -178,16 +193,37 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {MOCK_USAGE_DATA.map(item => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.title}</TableCell>
-                      <TableCell>{item.date}</TableCell>
-                      <TableCell className="text-right text-red-500">
-                        -
-                        {item.tokens}
+                  {loadingUsage && (
+                    <TableRow>
+                      <TableCell colSpan={3} className="h-24 text-center">
+                        Loading...
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
+                  {!loadingUsage && usageHistory.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={3} className="h-24 text-center">
+                        No usage data found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {usageHistory.map((item) => {
+                    const thread = Object.values(threadItems).find((t: any) => t.id === item.threadId) as any;
+                    const displayTitle = thread?.title || item.title || 'Chat Session';
+
+                    return (
+                      <TableRow key={item.threadId}>
+                        <TableCell className="max-w-[300px] truncate font-medium" title={displayTitle}>
+                          {displayTitle}
+                        </TableCell>
+                        <TableCell>{new Date(item.lastUsedAt).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right text-red-500">
+                          -
+                          {item.totalTokens}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
@@ -213,7 +249,8 @@ export const SettingsModal = ({ open, onOpenChange, defaultTab = 'general' }: Se
       try {
         const response = await fetch('/api/user/tokens');
         const data = await response.json();
-        setTokenBalance(data.tokenBalance);
+        const balance = data.tokenBalance;
+        setTokenBalance(balance < 0 ? 0 : balance);
       } catch (error) {
         console.error('Failed to fetch token balance', error);
       }

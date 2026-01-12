@@ -58,6 +58,18 @@ export const userSchema = pgTable('user', {
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 });
 
+export const tokenUsageSchema = pgTable('token_usage', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull(),
+  threadId: text('thread_id'),
+  promptTokens: integer('prompt_tokens').notNull(),
+  completionTokens: integer('completion_tokens').notNull(),
+  totalTokens: integer('total_tokens').notNull(),
+  model: text('model').notNull(),
+  description: text('description'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
 export const todoSchema = pgTable('todo', {
   id: serial('id').primaryKey(),
   ownerId: text('owner_id').notNull(),

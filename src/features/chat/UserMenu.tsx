@@ -113,7 +113,8 @@ export const UserMenu = ({ isCollapsed }: UserMenuProps) => {
       try {
         const response = await fetch('/api/user/tokens');
         const data = await response.json();
-        setTokenBalance(data.tokenBalance);
+        const balance = data.tokenBalance;
+        setTokenBalance(balance < 0 ? 0 : balance);
       } catch (error) {
         console.error('Failed to fetch token balance', error);
       }

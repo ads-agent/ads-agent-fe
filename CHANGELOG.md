@@ -1,3 +1,15 @@
+## [1.8.9] (2026-01-11)
+
+
+### Features
+
+* **billing**: implement token usage tracking and server-side balance reduction in the chat API
+* **billing**: add `token_usage` schema and migration for persistent consumption logging
+* **billing**: create usage history API with thread-based aggregation and activity grouping
+* **chat-ui**: update settings modal to display real usage data with thread titles from runtime
+* **chat-ui**: enforce non-negative balance display across all UI components (`UserMenu`, `SettingsModal`, `TokenBalance`)
+* **chat-ui**: remove model information from usage history for a cleaner interface
+
 ## [1.8.8] (2026-01-11)
 
 
