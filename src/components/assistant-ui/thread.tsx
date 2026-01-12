@@ -72,9 +72,9 @@ const ThreadScrollToBottom: FC = () => {
       <TooltipIconButton
         tooltip={t("tooltip_scroll_bottom")}
         variant="outline"
-        className="aui-thread-scroll-to-bottom absolute -top-12 z-10 self-center rounded-full p-4 disabled:invisible dark:bg-background dark:hover:bg-accent"
+        className="aui-thread-scroll-to-bottom absolute -top-12 z-10 self-center rounded-full size-10 p-2 disabled:invisible dark:bg-background dark:hover:bg-accent"
       >
-        <ArrowDownIcon />
+        <ArrowDownIcon className="size-5" />
       </TooltipIconButton>
     </ThreadPrimitive.ScrollToBottom>
   );
@@ -310,8 +310,8 @@ const UserActionBar: FC = () => {
       className="aui-user-action-bar-root flex flex-col items-end"
     >
       <ActionBarPrimitive.Edit asChild>
-        <TooltipIconButton tooltip={t("tooltip_edit")} className="aui-user-action-edit p-4">
-          <PencilIcon />
+        <TooltipIconButton tooltip={t("tooltip_edit")} className="aui-user-action-edit">
+          <PencilIcon className="size-4" />
         </TooltipIconButton>
       </ActionBarPrimitive.Edit>
     </ActionBarPrimitive.Root>
