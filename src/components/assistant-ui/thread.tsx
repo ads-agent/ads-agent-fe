@@ -103,37 +103,49 @@ const ThreadSuggestions: FC = () => {
   const t = useTranslations("Chat");
   const suggestions = [
     {
-      title: t("suggestion_weather_title"),
-      label: t("suggestion_weather_label"),
-      prompt: `${t("suggestion_weather_title")} ${t("suggestion_weather_label")}`,
+      title: t("suggestion_1_title"),
+      content: t("suggestion_1_content"),
     },
     {
-      title: t("suggestion_hooks_title"),
-      label: t("suggestion_hooks_label"),
-      prompt: `${t("suggestion_hooks_title")} ${t("suggestion_hooks_label")}`,
+      title: t("suggestion_2_title"),
+      content: t("suggestion_2_content"),
     },
-  ];
+    {
+      title: t("suggestion_3_title"),
+      content: t("suggestion_3_content"),
+    },
+    {
+      title: t("suggestion_4_title"),
+      content: t("suggestion_4_content"),
+    },
+  ].map((s) => ({
+    ...s,
+    prompt: `${s.title} ${s.content}`,
+  }));
 
   return (
-    <div className="aui-thread-welcome-suggestions grid w-full @md:grid-cols-2 gap-2 pb-4">
+    <div className="aui-thread-welcome-suggestions grid w-full grid-cols-1 sm:grid-cols-2 gap-4 pb-4">
       {suggestions.map((suggestion, index) => (
         <div
           key={suggestion.prompt}
-          className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 @md:nth-[n+3]:block nth-[n+3]:hidden animate-in fill-mode-both duration-200"
+          className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-200"
           style={{ animationDelay: `${100 + index * 50}ms` }}
         >
           <ThreadPrimitive.Suggestion prompt={suggestion.prompt} send asChild>
             <Button
               variant="ghost"
-              className="aui-thread-welcome-suggestion h-auto w-full @md:flex-col flex-wrap items-start justify-start gap-1 rounded-2xl border px-4 py-3 text-left text-sm transition-colors hover:bg-muted"
+              className="aui-thread-welcome-suggestion h-auto min-h-[110px] w-full flex items-center justify-between gap-4 rounded-2xl border p-5 text-left transition-colors hover:bg-muted whitespace-normal"
               aria-label={suggestion.prompt}
             >
-              <span className="aui-thread-welcome-suggestion-text-1 font-medium">
-                {suggestion.title}
-              </span>
-              <span className="aui-thread-welcome-suggestion-text-2 text-muted-foreground">
-                {suggestion.label}
-              </span>
+              <div className="flex flex-col gap-2 overflow-hidden">
+                <span className="aui-thread-welcome-suggestion-title font-bold line-clamp-1 text-sm">
+                  {suggestion.title}
+                </span>
+                <span className="aui-thread-welcome-suggestion-content text-muted-foreground line-clamp-2 text-xs leading-relaxed">
+                  {suggestion.content}
+                </span>
+              </div>
+              <ChevronRightIcon className="size-5 shrink-0 text-muted-foreground" />
             </Button>
           </ThreadPrimitive.Suggestion>
         </div>

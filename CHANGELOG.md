@@ -9,6 +9,8 @@
 * **chat-ui**: update settings modal to display real usage data with thread titles from runtime
 * **chat-ui**: enforce non-negative balance display across all UI components (`UserMenu`, `SettingsModal`, `TokenBalance`)
 * **chat-ui**: remove model information from usage history for a cleaner interface
+* **chat-ui**: redesign prompt suggestions with a 2x2 responsive grid and improved card layout (title/content separation, line clamping, and chevron icons)
+* **chat-ui**: expand initial prompt suggestions to 4 specialized diagnostic questions with full English and Chinese localization
 
 ## [1.8.8] (2026-01-11)
 
