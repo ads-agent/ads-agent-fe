@@ -228,6 +228,10 @@
     "token_purchase_description": "Enter the number of token packs you want to purchase. Each pack contains 100 tokens.",
     "token_purchase_quantity": "Quantity",
     "token_purchase_button": "Buy Tokens",
-    "token_purchase_redirecting": "Redirecting..."
+    "token_purchase_redirecting": "Redirecting...",
+    "share_chat_title": "Share Chat",
+    "share_chat_description": "Generate a public link to share this chat.",
+    "share_chat_create_link_error": "Failed to create share link",
+    "close": "Close"
   }
 }

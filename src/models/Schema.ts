@@ -1,11 +1,13 @@
 import {
   bigint,
   integer,
+  jsonb,
   pgTable,
   serial,
   text,
   timestamp,
   uniqueIndex,
+  uuid,
 } from 'drizzle-orm/pg-core';
 
 // This file defines the structure of your database tables using the Drizzle ORM.
@@ -81,3 +83,27 @@ export const todoSchema = pgTable('todo', {
     .notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 });
+
+// Shared chat history for public sharing via UUID
+export const sharedChatSchema = pgTable(
+  'shared_chat',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id').notNull(),
+    threadId: text('thread_id').notNull(),
+    md5: text('md5').notNull(),
+    threadTitle: text('thread_title'),
+    messages: jsonb('messages').notNull(),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      // Unique constraint on (userId, threadId, md5) to prevent duplicates
+      userThreadMd5Idx: uniqueIndex('user_thread_md5_idx').on(
+        table.userId,
+        table.threadId,
+        table.md5,
+      ),
+    };
+  },
+);

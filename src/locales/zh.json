@@ -228,6 +228,10 @@
     "token_purchase_description": "输入您想要购买的代币包数量。每个代币包包含 100 个代币。",
     "token_purchase_quantity": "数量",
     "token_purchase_button": "购买代币",
-    "token_purchase_redirecting": "重定向中..."
+    "token_purchase_redirecting": "重定向中...",
+    "share_chat_title": "分享对话",
+    "share_chat_description": "生成一个公共链接以分享此对话。",
+    "share_chat_create_link_error": "生成分享链接失败",
+    "close": "关闭"
   }
 }

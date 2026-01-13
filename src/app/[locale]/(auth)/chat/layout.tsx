@@ -19,6 +19,7 @@ import { z } from 'zod';
 
 import { ThreadList } from '@/components/assistant-ui/thread-list';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ShareChatModal } from '@/features/chat/ShareChatModal';
 import { UserMenu } from '@/features/chat/UserMenu';
 import { Env } from '@/libs/Env';
 
@@ -33,6 +34,47 @@ function getActiveThreadId(pathname: string | null) {
   }
   const m = pathname.match(/\/chat\/([^/]+)/);
   return m?.[1] ?? null;
+}
+
+function ChatHeader({
+  setSidebarOpen,
+}: {
+  setSidebarOpen: (open: boolean) => void;
+}) {
+  const t = useTranslations('Chat');
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+
+  return (
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <button
+        type="button"
+        className="rounded-md border px-2 py-1 text-sm hover:bg-muted md:hidden"
+        onClick={() => setSidebarOpen(true)}
+        aria-label={t('sidebar_open')}
+      >
+        ☰
+      </button>
+
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <span className="text-sm font-semibold">{t('chat_header')}</span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
+          onClick={() => setShareModalOpen(true)}
+        >
+          {t('share')}
+        </button>
+      </div>
+
+      <ShareChatModal
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+      />
+    </header>
+  );
 }
 
 /* eslint-disable no-console */
@@ -369,29 +411,7 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
             ].join(' ')}
           >
             {/* Top bar */}
-            <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-              <button
-                type="button"
-                className="rounded-md border px-2 py-1 text-sm hover:bg-muted md:hidden"
-                onClick={() => setSidebarOpen(true)}
-                aria-label={t('sidebar_open')}
-              >
-                ☰
-              </button>
-
-              <div className="flex min-w-0 flex-1 items-center gap-2">
-                <span className="text-sm font-semibold">{t('chat_header')}</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
-                >
-                  {t('share')}
-                </button>
-              </div>
-            </header>
+            <ChatHeader setSidebarOpen={setSidebarOpen} />
 
             {/* Content */}
             <main className="flex-1 overflow-hidden">{children}</main>

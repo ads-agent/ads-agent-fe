@@ -1,3 +1,16 @@
+## [1.9.0] (2026-01-12)
+
+
+### Features
+
+* **chat**: implement public chat sharing with UUID-based deep linking and persistent database storage
+* **chat**: create a specialized, read-only shared thread view with manual `ReactMarkdown` rendering to avoid runtime dependencies
+* **chat**: add `ShareChatModal` for generating public links with automatic thread state extraction and field filtering
+* **chat**: implement absolute URL generation for share links by combining origin with API-returned paths
+* **chat-ui**: optimize shared markdown rendering with custom `CodeHeader`, code block detection, and "text" language fallback
+* **chat-ui**: add a prominent "Start a new Chat" call-to-action on shared pages to drive user engagement
+* **i18n**: implement full English and Chinese localization for all share-related UI components and modals
+
 ## [1.8.9] (2026-01-11)
 
 
