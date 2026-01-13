@@ -17,6 +17,8 @@ const intlMiddleware = createMiddleware({
 const isPublicRoute = createRouteMatcher([
   '/api/webhook/stripe',
   '/:locale/api/webhook/stripe',
+  '/api/share/chat/(.*)',
+  '/:locale/api/share/chat/(.*)',
 ]);
 
 const isProtectedRoute = createRouteMatcher([
