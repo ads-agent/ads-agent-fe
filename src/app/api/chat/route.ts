@@ -18,6 +18,7 @@ const BodySchema = z.object({
   messages: z.array(z.any()),
   system: z.string().optional(),
   threadId: z.string().optional(),
+  model: z.string().optional(),
 });
 
 export async function POST(req: Request) {
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { messages, system, threadId: reqThreadId } = parsed.data;
+    const { messages, system, threadId: reqThreadId, model: requestedModel } = parsed.data;
 
     // Determine which provider to use based on environment configuration
     let model;
@@ -70,8 +71,8 @@ export async function POST(req: Request) {
         },
       });
 
-      // Use the specific model for the custom server
-      model = customOpenAI.chat('gemini-2.5-flash-lite');
+      // Use the requested model or fallback
+      model = customOpenAI.chat(requestedModel || 'gemini-2.5-flash-lite');
     } else {
       // Fallback to direct OpenAI API usage
       const modelName = process.env.OPENAI_MODEL || 'gpt-4o-mini';

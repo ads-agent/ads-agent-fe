@@ -19,10 +19,28 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 
 import { ThreadList } from '@/components/assistant-ui/thread-list';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ShareChatModal } from '@/features/chat/ShareChatModal';
 import { UserMenu } from '@/features/chat/UserMenu';
 import { Env } from '@/libs/Env';
+
+const MODELS = [
+  { label: 'GPT-5.2 Pro', value: 'gpt-5.2-pro' },
+  { label: 'GPT-5.2', value: 'gpt-5.2' },
+  { label: 'GPT-5 Mini', value: 'gpt-5-mini' },
+  { label: 'GPT-5 Nano', value: 'gpt-5-nano' },
+  { label: 'Gemini 3 Pro Preview', value: 'gemini-3-pro-preview' },
+  { label: 'Gemini 3 Flash Preview', value: 'gemini-3-flash-preview' },
+  { label: 'Gemini 2.5 Pro', value: 'gemini-2.5-pro' },
+  { label: 'Gemini 2.5 Flash', value: 'gemini-2.5-flash' },
+  { label: 'Gemini 2.5 Flash-Lite', value: 'gemini-2.5-flash-lite' },
+];
 
 const _MessageMetadataSchema = z.object({
   thread_id: z.string().optional(),
@@ -39,11 +57,17 @@ function getActiveThreadId(pathname: string | null) {
 
 function ChatHeader({
   setSidebarOpen,
+  selectedModel,
+  setSelectedModel,
 }: {
   setSidebarOpen: (open: boolean) => void;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
 }) {
   const t = useTranslations('Chat');
   const [shareModalOpen, setShareModalOpen] = useState(false);
+
+  const currentModelLabel = MODELS.find(m => m.value === selectedModel)?.label || selectedModel;
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-background px-4">
@@ -57,14 +81,29 @@ function ChatHeader({
           <PanelLeftOpen size={18} />
         </button>
 
-        <div className="flex items-center gap-1.5 cursor-pointer rounded-lg px-2 py-1 hover:bg-muted transition-colors group">
-          <span className="text-sm font-bold tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
-            Manus 1.6 Lite
-          </span>
-          <svg className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-1.5 cursor-pointer rounded-lg px-2 py-1 hover:bg-muted transition-colors group">
+              <span className="text-sm font-bold tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
+                {currentModelLabel}
+              </span>
+              <svg className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            {MODELS.map((model) => (
+              <DropdownMenuItem
+                key={model.value}
+                onClick={() => setSelectedModel(model.value)}
+                className={selectedModel === model.value ? 'bg-muted font-bold' : ''}
+              >
+                {model.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="flex items-center gap-3">
@@ -183,6 +222,7 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isHeaderHovered, setIsHeaderHovered] = useState(false);
+  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash-lite');
 
   // Determine mode
   const useCustom = Env.NEXT_PUBLIC_USE_CUSTOM_SERVER_FOR_THREAD_PERSISTENCE === 'true';
@@ -236,6 +276,8 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
           if (urlThreadId) {
             body.threadId = urlThreadId;
           }
+
+          body.model = selectedModel;
 
           // Use absolute URL to avoid locale-prefix 404s
           const url = new URL('/api/chat', window.location.origin).toString();
@@ -406,7 +448,11 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
             ].join(' ')}
           >
             {/* Top bar */}
-            <ChatHeader setSidebarOpen={setSidebarOpen} />
+            <ChatHeader
+              setSidebarOpen={setSidebarOpen}
+              selectedModel={selectedModel}
+              setSelectedModel={setSelectedModel}
+            />
 
             {/* Content */}
             <main className="flex-1 overflow-hidden">{children}</main>
