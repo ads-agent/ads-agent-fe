@@ -98,10 +98,10 @@ const ThreadWelcome: FC = () => {
         
         <div className="aui-thread-welcome-message flex flex-col items-center justify-center px-4">
           <h1 className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-3 animate-in font-bold text-5xl tracking-tight duration-700 text-foreground/90">
-            {t("welcome_title") === "Chat.welcome_title" ? "我能为你做什么？" : t("welcome_title")}
+            {t("welcome_title")}
           </h1>
           <p className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-3 animate-in text-muted-foreground/70 text-xl mt-6 delay-200 duration-700 max-w-[540px] leading-relaxed">
-            {t("welcome_message") === "Chat.welcome_message" ? "分配一个任务或提问任何问题" : t("welcome_message")}
+            {t("welcome_message")}
           </p>
         </div>
       </div>
@@ -175,14 +175,14 @@ const Composer: FC = () => {
           <div className="flex items-center justify-between mt-3 pt-2">
              <div className="flex items-center gap-1">
                 <ComposerAddAttachment />
-                <TooltipIconButton tooltip="Tools" variant="ghost" className="rounded-full size-9 text-muted-foreground/60">
+                <TooltipIconButton tooltip={t("tooltip_tools")} variant="ghost" className="rounded-full size-9 text-muted-foreground/60">
                    <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                 </TooltipIconButton>
              </div>
               
               <div className="flex items-center gap-2">
                 <div className="hidden sm:block">
-                   <TooltipIconButton tooltip="Voice input" variant="ghost" className="rounded-full size-9 text-muted-foreground/60">
+                   <TooltipIconButton tooltip={t("tooltip_voice_input")} variant="ghost" className="rounded-full size-9 text-muted-foreground/60">
                       <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
                    </TooltipIconButton>
                 </div>

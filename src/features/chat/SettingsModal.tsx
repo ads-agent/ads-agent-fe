@@ -68,7 +68,7 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
           <div className="size-8 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
              <SettingsIcon className="size-4.5 text-primary" />
           </div>
-          <span className="font-bold tracking-tight text-foreground/90 text-lg">Settings</span>
+          <span className="font-bold tracking-tight text-foreground/90 text-lg">{t('settings_title')}</span>
         </div>
         <div className="space-y-1">
           {tabs.map(tab => (
@@ -101,7 +101,7 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
           {activeTab === 'general' && (
             <div className="space-y-12">
               <section>
-                <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-5 opacity-70">通用</h3>
+                <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-5 opacity-70">{t('settings_tab_general')}</h3>
                 <div className="space-y-6">
                   <div className="flex flex-col gap-4">
                     <span className="text-sm font-semibold text-foreground/90">{t('settings_language')}</span>
@@ -126,36 +126,36 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
               </section>
 
               <section>
-                <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-5 opacity-70">外观</h3>
+                <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-5 opacity-70">{t('settings_appearance')}</h3>
                 <div className="grid grid-cols-3 gap-4 max-w-md">
                   {[
-                    { id: 'light', label: '浅色', color: 'bg-zinc-50 border-zinc-200' },
-                    { id: 'dark', label: '深色', color: 'bg-zinc-900 border-zinc-800' },
-                    { id: 'system', label: '跟随系统', color: 'bg-gradient-to-br from-zinc-50 via-zinc-400 to-zinc-900 border-zinc-200' },
-                  ].map((t) => (
+                    { id: 'light', label: t('settings_theme_light'), color: 'bg-zinc-50 border-zinc-200' },
+                    { id: 'dark', label: t('settings_theme_dark'), color: 'bg-zinc-900 border-zinc-800' },
+                    { id: 'system', label: t('settings_theme_system'), color: 'bg-gradient-to-br from-zinc-50 via-zinc-400 to-zinc-900 border-zinc-200' },
+                  ].map((themeItem) => (
                     <button
-                      key={t.id}
-                      onClick={() => setTheme(t.id)}
+                      key={themeItem.id}
+                      onClick={() => setTheme(themeItem.id)}
                       className="flex flex-col items-center gap-3 group transition-all outline-none"
                     >
                       <div className={clsx(
                         "w-full aspect-[4/3] rounded-xl border-2 transition-all p-2 flex items-center justify-center relative overflow-hidden",
-                        theme === t.id ? "border-primary ring-4 ring-primary/10 shadow-sm" : "border-muted dark:border-zinc-800 group-hover:border-zinc-300 dark:group-hover:border-zinc-600",
-                        t.color
+                        theme === themeItem.id ? "border-primary ring-4 ring-primary/10 shadow-sm" : "border-muted dark:border-zinc-800 group-hover:border-zinc-300 dark:group-hover:border-zinc-600",
+                        themeItem.color
                       )}>
-                         {t.id !== 'system' && (
+                         {themeItem.id !== 'system' && (
                            <div className={clsx(
                              "w-full h-full rounded-lg flex flex-col gap-1.5 p-2 shadow-inner",
-                             t.id === 'light' ? "bg-white" : "bg-zinc-950"
+                             themeItem.id === 'light' ? "bg-white" : "bg-zinc-950"
                            )}>
-                              <div className={clsx("w-3/4 h-1.5 rounded-full", t.id === 'light' ? "bg-zinc-100" : "bg-zinc-800")} />
-                              <div className={clsx("w-1/2 h-1.5 rounded-full", t.id === 'light' ? "bg-zinc-100" : "bg-zinc-800")} />
+                              <div className={clsx("w-3/4 h-1.5 rounded-full", themeItem.id === 'light' ? "bg-zinc-100" : "bg-zinc-800")} />
+                              <div className={clsx("w-1/2 h-1.5 rounded-full", themeItem.id === 'light' ? "bg-zinc-100" : "bg-zinc-800")} />
                               <div className="mt-auto flex justify-end">
-                                 <div className={clsx("size-3 rounded-full", t.id === 'light' ? "bg-zinc-200" : "bg-zinc-700")} />
+                                 <div className={clsx("size-3 rounded-full", themeItem.id === 'light' ? "bg-zinc-200" : "bg-zinc-700")} />
                               </div>
                            </div>
                          )}
-                         {theme === t.id && (
+                         {theme === themeItem.id && (
                            <div className="absolute inset-0 bg-primary/5 flex items-center justify-center">
                               <div className="bg-primary text-primary-foreground rounded-full p-1 shadow-lg">
                                 <CheckIcon className="size-3 stroke-[3px]" />
@@ -163,8 +163,8 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
                            </div>
                          )}
                       </div>
-                      <span className={clsx("text-xs font-semibold transition-colors", theme === t.id ? "text-primary" : "text-muted-foreground group-hover:text-foreground")}>
-                        {t.label}
+                      <span className={clsx("text-xs font-semibold transition-colors", theme === themeItem.id ? "text-primary" : "text-muted-foreground group-hover:text-foreground")}>
+                        {themeItem.label}
                       </span>
                     </button>
                   ))}
@@ -199,7 +199,7 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
               </div>
 
               <section>
-                 <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-5 opacity-70">资产</h3>
+                 <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-5 opacity-70">{t('settings_assets')}</h3>
                  <div className="flex flex-col gap-4">
                     <div className="p-5 rounded-[2rem] border bg-background shadow-sm dark:bg-zinc-900/20 dark:border-zinc-800/50 flex items-center justify-between group hover:border-primary/20 transition-colors">
                       <div className="flex items-center gap-4">
@@ -209,9 +209,9 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
                          <div className="flex flex-col">
                             <div className="flex items-baseline gap-1.5">
                                <span className="text-2xl font-black tracking-tight text-foreground">{tokenBalance ?? '...'}</span>
-                               <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Tokens</span>
+                               <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('settings_usage_table_usage')}</span>
                             </div>
-                            <span className="text-[10px] text-muted-foreground font-medium">Available for current billing cycle</span>
+                            <span className="text-[10px] text-muted-foreground font-medium">{t('settings_tokens_available_description')}</span>
                          </div>
                       </div>
                       <Button 
@@ -220,7 +220,7 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
                         className="h-9 rounded-xl text-xs font-bold px-5 border-muted-foreground/20 hover:bg-muted dark:hover:bg-zinc-800 transition-all active:scale-95" 
                         onClick={() => setActiveTab('usage')}
                       >
-                        查看详情
+                        {t('settings_view_details')}
                       </Button>
                     </div>
                     
@@ -249,19 +249,19 @@ const SettingsContent = ({ defaultTab, user, signOut, openUserProfile, theme, se
                         <TableCell colSpan={3} className="h-64 text-center text-muted-foreground font-medium">
                           <div className="flex flex-col items-center gap-3">
                              <div className="size-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                             <span>Loading usage history...</span>
+                             <span>{t('settings_usage_loading')}</span>
                           </div>
                         </TableCell>
                       </TableRow>
                     ) : usageHistory.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={3} className="h-64 text-center text-muted-foreground font-medium">
-                          No usage data found.
+                          {t('settings_usage_no_data')}
                         </TableCell>
                       </TableRow>
                     ) : usageHistory.map((item) => {
                       const thread = Object.values(threadItems).find((t: any) => t.id === item.threadId) as any;
-                      const displayTitle = thread?.title || item.title || 'Chat Session';
+                      const displayTitle = thread?.title || item.title || t('settings_usage_fallback_title');
 
                       return (
                         <TableRow key={item.threadId} className="hover:bg-muted/30 dark:hover:bg-zinc-900/30 transition-colors border-muted dark:border-zinc-900">
