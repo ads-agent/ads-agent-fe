@@ -90,11 +90,13 @@ const ThreadWelcome: FC = () => {
   return (
     <div className="aui-thread-welcome-root mx-auto flex w-full max-w-(--thread-max-width) flex-col items-center justify-center py-12">
       <div className="flex flex-col items-center gap-8 text-center">
+        {/* 
         <div className="inline-flex items-center gap-2 rounded-full bg-secondary/80 px-4 py-1.5 text-[13px] font-medium text-muted-foreground/80 shadow-sm border border-border/50 backdrop-blur-sm">
           <span>{t("welcome_badge_left") === "Chat.welcome_badge_left" ? "免费计划" : t("welcome_badge_left")}</span>
           <div className="h-3 w-px bg-border/60 mx-1" />
           <span className="text-primary cursor-pointer hover:underline font-semibold">{t("welcome_badge_right") === "Chat.welcome_badge_right" ? "开始免费试用" : t("welcome_badge_right")}</span>
         </div>
+        */}
         
         <div className="aui-thread-welcome-message flex flex-col items-center justify-center px-4">
           <h1 className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-3 animate-in font-bold text-5xl tracking-tight duration-700 text-foreground/90">
