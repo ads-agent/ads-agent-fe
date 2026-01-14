@@ -53,6 +53,7 @@
     "@tanstack/react-table": "^8.20.5",
     "ai": "5.0.117",
     "class-variance-authority": "^0.7.0",
+    "cloudinary": "^2.8.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.35.1",
     "lucide-react": "^0.453.0",

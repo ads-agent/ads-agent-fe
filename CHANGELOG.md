@@ -1,3 +1,12 @@
+## [1.10.0] (2026-01-14)
+
+
+### Features
+
+* **chat-api**: implement video understanding via Cloudinary frame extraction, enabling the model to "see" video content through sampled frames
+* **chat-api**: add CSV file processing support, allowing users to upload and analyze CSV data with automatic text conversion and truncation
+* **api**: add `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` environment variables for media processing configuration
+
 ## [1.9.1] (2026-01-13)
 
 

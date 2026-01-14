@@ -1,10 +1,13 @@
 // src/app/api/chat/route.ts
+import { Buffer } from 'node:buffer';
+
 import { createOpenAI, openai } from '@ai-sdk/openai';
 import { auth } from '@clerk/nextjs/server';
 import {
   convertToModelMessages,
   streamText,
 } from 'ai';
+import { v2 as cloudinary } from 'cloudinary';
 import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -20,6 +23,229 @@ const BodySchema = z.object({
   threadId: z.string().optional(),
   model: z.string().optional(),
 });
+
+// ==================== Video Processing ====================
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+  api_key: process.env.CLOUDINARY_API_KEY!,
+  api_secret: process.env.CLOUDINARY_API_SECRET!,
+  secure: true,
+});
+
+function buildSignedCloudinaryFrameUrl(opts: {
+  cloudName: string;
+  videoUrl: string;
+  so: number | 'auto';
+  width?: number; // 可选：给模型用的缩略尺寸，省带宽/更便宜
+  quality?: string; // 可选：q_auto 等
+}) {
+  const { videoUrl, so, width = 768, quality = 'auto' } = opts;
+
+  // Cloudinary transformation 参数名在 SDK 里是 start_offset / quality / width 等
+  // format: "jpg" 表示输出图片
+  const url = cloudinary.url(videoUrl, {
+    resource_type: 'video',
+    type: 'fetch',
+    sign_url: true,
+    format: 'jpg',
+    transformation: [
+      {
+        start_offset: so === 'auto' ? 'auto' : so,
+        width,
+        crop: 'scale',
+        quality,
+      },
+    ],
+  });
+
+  return url;
+}
+
+// 1) 生成 Cloudinary “从远程视频 fetch 并截帧输出 jpg” 的 URL
+function buildCloudinaryFrameUrl(opts: {
+  cloudName: string;
+  videoUrl: string;
+  // so can be number (seconds) or "auto"
+  so: number | 'auto';
+  width?: number; // 可选：给模型用的缩略尺寸，省带宽/更便宜
+  quality?: string; // 可选：q_auto 等
+}): string {
+  const { cloudName, videoUrl, so, width = 768, quality = 'q_auto' } = opts;
+
+  // Cloudinary fetch URL 里远程 URL 要 encode
+  const encoded = encodeURIComponent(videoUrl);
+
+  // transformations：so_*, w_*, q_auto（可以按需删减）
+  const soPart = so === 'auto' ? 'so_auto' : `so_${so}`;
+  const tx = `${soPart},w_${width},${quality}`;
+
+  // 注意：这里用 /video/fetch/… 然后以 .jpg 结尾表示输出图片
+  return `https://res.cloudinary.com/${cloudName}/video/fetch/${tx}/${encoded}.jpg`;
+}
+// keep for future use
+void buildCloudinaryFrameUrl;
+
+// 2) 改写 messages：video file part => text(original url) + image frames
+function rewriteVideoPartsToFrames(messages: any[], cloudName: string) {
+  const defaultOffsets = [0, 1, 2, 3, 4, 5, 6]; // 秒
+  return messages.map((m) => {
+    if (!Array.isArray(m.parts)) {
+      return m;
+    }
+
+    const newParts: any[] = [];
+    for (const p of m.parts) {
+      const isVideo
+        = p?.type === 'file'
+        && typeof p.mediaType === 'string'
+        && p.mediaType.startsWith('video/')
+        && typeof p.url === 'string';
+
+      if (!isVideo) {
+        newParts.push(p);
+        continue;
+      }
+
+      const videoUrl = p.url;
+
+      // 2.1 保留原始 URL（最稳：text part 不会触发 provider 的 video 限制）
+      newParts.push({
+        type: 'text',
+        text: `VIDEO_URL: ${videoUrl}`,
+      });
+
+      // 2.2 生成多张帧图（image/jpeg）
+      const frameParts = [
+        ...defaultOffsets.map(sec => ({
+          type: 'file',
+          url: buildSignedCloudinaryFrameUrl({ cloudName, videoUrl, so: sec }),
+          filename: `frame_${sec}s.jpg`,
+          mediaType: 'image/jpeg',
+        })),
+        {
+          type: 'file',
+          url: buildSignedCloudinaryFrameUrl({ cloudName, videoUrl, so: 'auto' }),
+          filename: `frame_auto.jpg`,
+          mediaType: 'image/jpeg',
+        },
+      ];
+
+      // 2.3 可选：给模型一个时间戳说明（更容易引用）
+      newParts.push({
+        type: 'text',
+        text:
+          `Frame timestamps (approx): ${
+            defaultOffsets.map(s => `${s}s`).join(', ')
+          }, auto`,
+      });
+
+      newParts.push(...frameParts);
+    }
+
+    return { ...m, parts: newParts };
+  });
+}
+
+// ==================== CSV Processing ====================
+const MAX_CSV_BYTES = 200_000; // 约 200KB，避免把上下文/带宽炸掉
+const MAX_LINES = 300; // 也避免太长
+
+async function fetchTextWithLimit(url: string, maxBytes: number): Promise<string> {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch CSV (${res.status})`);
+  }
+
+  // 只取前 maxBytes 字节
+  const reader = res.body?.getReader();
+  if (!reader) {
+    const text = await res.text();
+    return text.slice(0, maxBytes);
+  }
+
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) {
+      break;
+    }
+    if (!value) {
+      continue;
+    }
+
+    const nextTotal = total + value.byteLength;
+    if (nextTotal > maxBytes) {
+      chunks.push(value.slice(0, maxBytes - total));
+      total = maxBytes;
+      break;
+    }
+
+    chunks.push(value);
+    total = nextTotal;
+    if (total >= maxBytes) {
+      break;
+    }
+  }
+
+  const buf = Buffer.concat(chunks.map(c => Buffer.from(c)));
+  return buf.toString('utf-8');
+}
+
+function clampLines(text: string, maxLines: number) {
+  const lines = text.split(/\r?\n/);
+  if (lines.length <= maxLines) {
+    return text;
+  }
+  return `${lines.slice(0, maxLines).join('\n')}\n\n[TRUNCATED: ${lines.length - maxLines} more lines]`;
+}
+
+async function rewriteCsvPartsToText(messages: any[]) {
+  const out = [];
+
+  for (const m of messages) {
+    if (!Array.isArray(m.parts)) {
+      out.push(m);
+      continue;
+    }
+
+    const newParts: any[] = [];
+    for (const p of m.parts) {
+      const isCsv
+        = p?.type === 'file'
+        && typeof p.mediaType === 'string'
+        && p.mediaType.toLowerCase() === 'text/csv'
+        && typeof p.url === 'string';
+
+      if (!isCsv) {
+        newParts.push(p);
+        continue;
+      }
+
+      // 1) 保留原始 URL（给 server future flexible）
+      newParts.push({ type: 'text', text: `CSV_URL: ${p.url}` });
+
+      // 2) 把 CSV 内容内联进 prompt
+      let csvText = await fetchTextWithLimit(p.url, MAX_CSV_BYTES);
+      csvText = clampLines(csvText, MAX_LINES);
+
+      const name = p.filename ? ` (${p.filename})` : '';
+      newParts.push({
+        type: 'text',
+        text:
+          `Here is the CSV content${name}:\n`
+          + `\`\`\`csv\n${
+            csvText.replace(/```/g, '``\\`') // 防止意外结束 code fence
+          }\n\`\`\``,
+      });
+    }
+
+    out.push({ ...m, parts: newParts });
+  }
+
+  return out;
+}
 
 export async function POST(req: Request) {
   const requestId = crypto.randomUUID();
@@ -79,7 +305,14 @@ export async function POST(req: Request) {
       model = openai(modelName);
     }
 
-    const modelMessages = await convertToModelMessages(messages);
+    let rewrittenMessages = messages;
+    // 先把 CSV 变成 text
+    rewrittenMessages = await rewriteCsvPartsToText(rewrittenMessages);
+    // 再把 video 变成 image frames（你已有的 rewriteVideoParts...）
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME!;
+    rewrittenMessages = await rewriteVideoPartsToFrames(rewrittenMessages, cloudName);
+
+    const modelMessages = await convertToModelMessages(rewrittenMessages);
 
     const result = streamText({
       model,
