@@ -146,11 +146,11 @@ export const UserMenu = ({ isCollapsed }: UserMenuProps) => {
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="flex size-10 items-center justify-center rounded-lg hover:bg-muted/50 focus:outline-none"
+              className="flex size-10 items-center justify-center rounded-xl hover:bg-muted focus:outline-none"
             >
-              <Avatar className="size-8">
+              <Avatar className="size-5">
                 <AvatarImage src={user.imageUrl} />
-                <AvatarFallback>{user.firstName?.[0]}</AvatarFallback>
+                <AvatarFallback className="text-[10px]">{user.firstName?.[0]}</AvatarFallback>
               </Avatar>
             </button>
           </DropdownMenuTrigger>
@@ -173,22 +173,24 @@ export const UserMenu = ({ isCollapsed }: UserMenuProps) => {
   // Expanded View: Avatar + Token Balance | Blog Button
   return (
     <>
-      <div className="flex w-full items-center justify-between gap-2 px-1">
+      <div className="flex w-full items-center justify-between gap-2">
         <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="flex items-center gap-2 rounded-full bg-muted/50 p-1 pr-3 transition-colors hover:bg-muted focus:outline-none"
+              className="flex items-center gap-2 rounded-xl p-1.5 transition-all hover:bg-muted focus:outline-none active:scale-95"
             >
-              <Avatar className="size-8">
+              <Avatar className="size-5">
                 <AvatarImage src={user.imageUrl} />
-                <AvatarFallback>{user.firstName?.[0]}</AvatarFallback>
+                <AvatarFallback className="text-[10px]">{user.firstName?.[0]}</AvatarFallback>
               </Avatar>
 
               {tokenBalance !== null && (
-                <div className="flex items-center gap-1.5 text-sm font-medium">
-                  <Coins className="size-4 text-yellow-500" />
-                  <span>{tokenBalance}</span>
+                <div className="flex items-center gap-1.5 text-sm font-bold text-foreground/80">
+                  <div className="size-4 rounded-full bg-yellow-400 flex items-center justify-center text-[10px] text-white">
+                    <Coins className="size-2.5" />
+                  </div>
+                  <span>{tokenBalance.toLocaleString()}</span>
                 </div>
               )}
             </button>
@@ -203,13 +205,13 @@ export const UserMenu = ({ isCollapsed }: UserMenuProps) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <a
-              href="/blog" // Update with actual blog URL if known, assuming /blog for now
-              className="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+              href="/blog"
+              className="flex items-center justify-center rounded-xl size-10 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               target="_blank"
               rel="noopener noreferrer"
               aria-label={t('user_menu_blog')}
             >
-              <BookOpen className="size-4" />
+              <BookOpen className="size-5" />
             </a>
           </TooltipTrigger>
           <TooltipContent>{t('user_menu_blog')}</TooltipContent>

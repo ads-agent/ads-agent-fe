@@ -166,6 +166,8 @@
   "Chat": {
     "welcome_title": "您好！",
     "welcome_message": "今天我能为您做些什么？",
+    "welcome_badge_left": "免费计划",
+    "welcome_badge_right": "开始免费试用",
     "suggestion_1_title": "我的广告表现突然下降——为什么？",
     "suggestion_1_content": "我正在 Meta 上投放广告。在过去的 7 天里，转化率 / CPA / ROAS 等关键指标显著恶化。我的营销活动目标是“销售”，针对美国市场。请从账户结构、学习期、素材疲劳、受众定向、出价和预算等角度帮助诊断可能的原因，并建议具有明确优先级的优化行动。",
     "suggestion_2_title": "我有点击但没有转化——出了什么问题？",

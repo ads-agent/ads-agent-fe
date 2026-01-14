@@ -44,7 +44,6 @@ const ThreadListNew: FC<{ isCollapsed?: boolean }> = ({ isCollapsed }) => {
   const t = useTranslations("Chat");
   const router = useRouter();
   const handleNewThreadClick = () => {
-    // ThreadListItemPrimitive.New 会负责“切线程”，我们只负责改 URL
     router.push(`/chat`);
   };
 
@@ -53,14 +52,14 @@ const ThreadListNew: FC<{ isCollapsed?: boolean }> = ({ isCollapsed }) => {
       <Button
         variant="outline"
         className={cn(
-          "aui-thread-list-new h-9 hover:bg-muted data-active:bg-muted",
+          "aui-thread-list-new h-11 bg-card hover:bg-card border-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all active:scale-[0.98] mb-6 font-bold text-foreground/90",
           isCollapsed
-            ? "w-9 justify-center px-0"
-            : "w-full justify-start gap-2 rounded-lg px-3 text-sm",
+            ? "w-11 justify-center px-0 rounded-xl"
+            : "w-full justify-start gap-3 rounded-xl px-4 text-[13px]",
         )}
         onClick={handleNewThreadClick}
       >
-        <PlusIcon className="size-4" />
+        <PlusIcon className="size-4.5 stroke-[2.5px]" />
         {!isCollapsed && t("new_thread")}
       </Button>
     </ThreadListPrimitive.New>
@@ -69,15 +68,15 @@ const ThreadListNew: FC<{ isCollapsed?: boolean }> = ({ isCollapsed }) => {
 
 const ThreadListSkeleton: FC = () => {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1.5">
       {Array.from({ length: 5 }, (_, i) => (
         <div
           key={i}
           role="status"
           aria-label="Loading threads"
-          className="aui-thread-list-skeleton-wrapper flex h-9 items-center px-3"
+          className="aui-thread-list-skeleton-wrapper flex h-10 items-center px-3"
         >
-          <Skeleton className="aui-thread-list-skeleton h-4 w-full" />
+          <Skeleton className="aui-thread-list-skeleton h-3.5 w-full rounded-md opacity-40" />
         </div>
       ))}
     </div>
@@ -87,17 +86,15 @@ const ThreadListSkeleton: FC = () => {
 const ThreadListItem: FC = () => {
   const t = useTranslations("Chat");
   const router = useRouter();
-  // hook 里能拿到当前这个 item 的 threadId
   const threadId = useThreadListItem((m) => m.threadId);
   const handleThreadItemClick = () => {
-    // ThreadListItemPrimitive.Trigger 会负责“切线程”，我们只负责改 URL
     router.push(`/chat/${threadId}`);
   };
 
   return (
-    <ThreadListItemPrimitive.Root className="aui-thread-list-item group flex h-9 items-center rounded-lg transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none data-active:bg-muted">
+    <ThreadListItemPrimitive.Root className="aui-thread-list-item group flex h-10 items-center rounded-xl transition-all hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none data-active:bg-muted/80 data-active:text-foreground">
       <ThreadListItemPrimitive.Trigger
-        className="aui-thread-list-item-trigger flex h-full flex-1 items-center truncate px-3 text-start text-sm"
+        className="aui-thread-list-item-trigger flex h-full flex-1 items-center truncate px-4 text-start text-[13px] font-medium text-muted-foreground/70 transition-colors group-hover:text-foreground/80 group-data-active:text-foreground"
         onClick={handleThreadItemClick}
       >
         <ThreadListItemPrimitive.Title fallback={t("new_chat_fallback")} />

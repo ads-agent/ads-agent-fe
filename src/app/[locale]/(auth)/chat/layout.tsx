@@ -1,10 +1,11 @@
 'use client';
 
-import { AssistantRuntimeProvider, useAssistantRuntime, useAssistantState } from '@assistant-ui/react';
+import { AssistantIf, AssistantRuntimeProvider, useAssistantRuntime, useAssistantState } from '@assistant-ui/react';
 import { AssistantChatTransport, useChatRuntime } from '@assistant-ui/react-ai-sdk';
 import { useAuth } from '@clerk/nextjs';
 import { AssistantCloud } from 'assistant-cloud';
 import {
+  ChevronRight,
   Loader2,
   PanelLeftClose,
   PanelLeftOpen,
@@ -45,28 +46,40 @@ function ChatHeader({
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <button
-        type="button"
-        className="rounded-md border px-2 py-1 text-sm hover:bg-muted md:hidden"
-        onClick={() => setSidebarOpen(true)}
-        aria-label={t('sidebar_open')}
-      >
-        ☰
-      </button>
-
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="text-sm font-semibold">{t('chat_header')}</span>
-      </div>
-
-      <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-background px-4">
+      <div className="flex items-center gap-4">
         <button
           type="button"
-          className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
-          onClick={() => setShareModalOpen(true)}
+          className="rounded-md border p-1.5 hover:bg-muted md:hidden"
+          onClick={() => setSidebarOpen(true)}
+          aria-label={t('sidebar_open')}
         >
-          {t('share')}
+          <PanelLeftOpen size={18} />
         </button>
+
+        <div className="flex items-center gap-1.5 cursor-pointer rounded-lg px-2 py-1 hover:bg-muted transition-colors group">
+          <span className="text-sm font-bold tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
+            Manus 1.6 Lite
+          </span>
+          <svg className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <AssistantIf condition={({ thread }) => !thread.isEmpty}>
+          <button
+            type="button"
+            className="flex items-center gap-2 rounded-full border bg-card px-4 py-1.5 text-sm font-medium hover:bg-muted transition-all shadow-sm active:scale-95"
+            onClick={() => setShareModalOpen(true)}
+          >
+            <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            <span className="hidden sm:inline">{t('share')}</span>
+          </button>
+        </AssistantIf>
       </div>
 
       <ShareChatModal
@@ -286,7 +299,7 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
           {/* Sidebar */}
           <aside
             className={[
-              'fixed left-0 top-0 z-50 h-screen border-r bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/80',
+              'fixed left-0 top-0 z-50 h-screen border-r bg-secondary/40 backdrop-blur-md transition-all duration-300',
               isCollapsed ? 'md:w-16' : 'md:w-72',
               sidebarOpen ? 'translate-x-0 w-72' : '-translate-x-full md:translate-x-0',
             ].join(' ')}
@@ -294,7 +307,7 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
             <div className="flex h-full flex-col">
               {/* Sidebar header */}
               <div
-                className="flex h-14 items-center justify-between p-3"
+                className="flex h-16 items-center justify-between px-4"
                 onMouseEnter={() => setIsHeaderHovered(true)}
                 onMouseLeave={() => setIsHeaderHovered(false)}
               >
@@ -305,19 +318,22 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                           <Image
                             src="/assets/images/adbuddy_logo_small.png"
                             alt="AdBuddy Logo"
-                            width={32}
-                            height={32}
-                            className="size-8 object-contain"
+                            width={26}
+                            height={26}
+                            className="size-6.5 object-contain"
                           />
-                          <span>AdBuddy.ai</span>
+                          <span className="tracking-tight text-foreground/90 font-bold">
+                            AdBuddy
+                            <span className="text-blue-500">.ai</span>
+                          </span>
                         </div>
                         <button
                           type="button"
-                          className="rounded-md p-1.5 hover:bg-muted"
+                          className="rounded-md p-1.5 hover:bg-muted text-muted-foreground transition-colors"
                           onClick={() => setIsCollapsed(true)}
                           aria-label={t('sidebar_collapse')}
                         >
-                          <PanelLeftClose size={20} />
+                          <PanelLeftClose size={18} />
                         </button>
                       </>
                     )
@@ -325,7 +341,7 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                       <div className="flex w-full justify-center">
                         <button
                           type="button"
-                          className="flex size-10 items-center justify-center rounded-md hover:bg-muted"
+                          className="flex size-10 items-center justify-center rounded-md hover:bg-muted transition-colors"
                           onClick={() => {
                             if (window.innerWidth < 768) {
                               setSidebarOpen(false);
@@ -336,14 +352,14 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                           aria-label={t('sidebar_expand')}
                         >
                           {isHeaderHovered
-                            ? <PanelLeftOpen size={20} />
+                            ? <PanelLeftOpen size={18} />
                             : (
                                 <Image
                                   src="/assets/images/adbuddy_logo_small.png"
                                   alt="AdBuddy Logo"
-                                  width={32}
-                                  height={32}
-                                  className="size-8 object-contain"
+                                  width={26}
+                                  height={26}
+                                  className="size-6.5 object-contain"
                                 />
                               )}
                         </button>
@@ -353,34 +369,13 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
 
               {/* Navigation buttons */}
               <div className="space-y-1 px-3 pb-3">
-                {/* Note: ThreadList typically includes a 'New Chat' button, but we keep our own if we want custom styling or if ThreadList's is hidden */}
-                {/* Only showing explicit New Chat if Custom Mode because ThreadList usually handles it in Cloud mode, or we can rely on ThreadList's own UI */}
-                {useCustom && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={onNewChat}
-                        className={[
-                          'flex w-full items-center gap-2 rounded-lg border bg-background py-2 text-sm font-medium hover:bg-muted',
-                          isCollapsed ? 'justify-center px-0' : 'px-3',
-                        ].join(' ')}
-                      >
-                        <Plus size={18} />
-                        {!isCollapsed && <span>{t('new_chat')}</span>}
-                      </button>
-                    </TooltipTrigger>
-                    {isCollapsed && <TooltipContent side="right">{t('new_chat')}</TooltipContent>}
-                  </Tooltip>
-                )}
-
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
                       type="button"
                       className={[
-                        'flex items-center gap-2 rounded-lg py-2 text-sm hover:bg-muted w-full',
-                        isCollapsed ? 'justify-center px-0' : 'px-3',
+                        'flex items-center gap-2.5 rounded-xl py-2 text-sm font-medium hover:bg-muted/60 w-full transition-colors text-muted-foreground/80 hover:text-foreground',
+                        isCollapsed ? 'justify-center px-0' : 'px-4',
                       ].join(' ')}
                     >
                       <Search size={18} />
@@ -392,12 +387,12 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
               </div>
 
               {/* Threads list */}
-              <div className="flex-1 overflow-y-auto px-2">
+              <div className="flex-1 overflow-y-auto px-2 pb-4">
                 <ThreadList isCollapsed={isCollapsed} />
               </div>
 
               {/* Sidebar footer */}
-              <div className="border-t p-3">
+              <div className="p-3 space-y-3">
                 <UserMenu isCollapsed={isCollapsed} />
               </div>
             </div>
