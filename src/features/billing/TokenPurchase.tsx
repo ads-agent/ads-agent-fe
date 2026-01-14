@@ -8,12 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Env } from '@/libs/Env';
 
-export const TokenPurchase = () => {
+export const TokenPurchase = ({ variant = 'default' }: { variant?: 'default' | 'inline' }) => {
   const t = useTranslations('Chat');
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
   const onPurchase = async () => {
+    // ... same logic
     try {
       setIsLoading(true);
       const response = await fetch('/api/stripe/checkout', {
@@ -38,6 +39,38 @@ export const TokenPurchase = () => {
       setIsLoading(false);
     }
   };
+
+  if (variant === 'inline') {
+    return (
+      <div className="flex flex-col gap-5">
+        <h3 className="text-sm font-bold text-foreground/90">{t('token_purchase_title')}</h3>
+        <div className="flex items-center gap-6">
+          <p className="flex-1 text-xs text-muted-foreground font-medium leading-relaxed">
+            {t('token_purchase_description')}
+          </p>
+          <div className="flex items-center gap-3">
+            <Input
+              id="quantity"
+              type="number"
+              min="1"
+              className="h-10 w-20 rounded-xl text-sm font-bold bg-background dark:bg-zinc-950 border-muted-foreground/20"
+              value={quantity}
+              onChange={e => setQuantity(Number.parseInt(e.target.value) || 1)}
+              disabled={isLoading}
+            />
+            <Button
+              size="sm"
+              className="h-10 rounded-xl px-6 text-xs font-bold shadow-md shadow-primary/10 transition-all active:scale-95 whitespace-nowrap"
+              onClick={onPurchase}
+              disabled={isLoading}
+            >
+              {isLoading ? t('token_purchase_redirecting') : t('token_purchase_button')}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border bg-card p-4 text-card-foreground shadow-sm">
