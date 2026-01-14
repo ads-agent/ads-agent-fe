@@ -8,15 +8,17 @@ import {
   Loader2,
   PanelLeftClose,
   PanelLeftOpen,
+  PlusIcon,
   Search,
 } from 'lucide-react';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 
 import { ThreadList } from '@/components/assistant-ui/thread-list';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +29,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ShareChatModal } from '@/features/chat/ShareChatModal';
 import { UserMenu } from '@/features/chat/UserMenu';
 import { Env } from '@/libs/Env';
+import { cn } from '@/utils/Helpers';
 
 const MODELS = [
   { label: 'GPT-5.2 Pro', value: 'gpt-5.2-pro' },
@@ -178,7 +181,7 @@ function ThreadSync() {
       }
     }
     if (threadListFirstTimeLoaded
-    // Not first time loaded, but navigation event
+      // Not first time loaded, but navigation event
       || (!threadListFirstTimeLoaded && finishedLoadingRef.current && isPopState.current)) {
       console.log('[zhengc][order] switching thread');
       if (isPopState.current) {
@@ -196,16 +199,8 @@ function ThreadSync() {
         // 切换到目标线程
         runtime.switchToThread(urlThreadId);
       } else {
-        if (!mainThreadId.startsWith('__LOCALID_')) {
-          const entry = Object.entries(threadItems).find(([, item]) => item.id.startsWith('__LOCALID_'));
-          if (!entry) {
-            // shouldn't reach
-            console.log('[zhengc][order] no EMPTY thread found');
-            return;
-          }
-          // 切换到目标线程
-          runtime.switchToThread(entry[1].id);
-        }
+        // 切换到空线程
+        runtime.switchToNewThread();
       }
     }
   }, [isPopState, pathname, mainThreadId, threadItems, isLoading, runtime]);
@@ -213,6 +208,31 @@ function ThreadSync() {
   return null;
 }
 /* eslint-enable no-console */
+
+const SidebarNewThreadButton = ({ isCollapsed }: { isCollapsed: boolean }) => {
+  const t = useTranslations('Chat');
+  const runtime = useAssistantRuntime();
+  const router = useRouter();
+
+  return (
+    <Button
+      variant="outline"
+      className={cn(
+        'aui-thread-list-new h-11 bg-card hover:bg-card border-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-all active:scale-[0.98] mb-6 font-bold text-foreground/90',
+        isCollapsed
+          ? 'w-11 justify-center px-0 rounded-xl'
+          : 'w-full justify-start gap-3 rounded-xl px-4 text-[13px]',
+      )}
+      onClick={() => {
+        runtime.switchToNewThread();
+        router.push(`/chat`);
+      }}
+    >
+      <PlusIcon className="size-4.5 stroke-[2.5px]" />
+      {!isCollapsed && t('new_thread')}
+    </Button>
+  );
+};
 
 function ChatLayoutContent({ children }: { children: React.ReactNode }) {
   const t = useTranslations('Chat');
@@ -419,6 +439,8 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                   </TooltipTrigger>
                   {isCollapsed && <TooltipContent side="right">{t('search')}</TooltipContent>}
                 </Tooltip>
+
+                <SidebarNewThreadButton isCollapsed={isCollapsed} />
               </div>
 
               {/* Threads list */}

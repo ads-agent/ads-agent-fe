@@ -25,7 +25,9 @@ export const ThreadList: FC<ThreadListProps> = ({ isCollapsed }) => {
         isCollapsed && "items-center",
       )}
     >
+      {/*
       <ThreadListNew isCollapsed={isCollapsed} />
+      */}
       {!isCollapsed && (
         <>
           <AssistantIf condition={({ threads }) => threads.isLoading}>
@@ -65,6 +67,8 @@ const ThreadListNew: FC<{ isCollapsed?: boolean }> = ({ isCollapsed }) => {
     </ThreadListPrimitive.New>
   );
 };
+// keep for future use
+void ThreadListNew;
 
 const ThreadListSkeleton: FC = () => {
   return (
