@@ -90,9 +90,9 @@ const ThreadListSkeleton: FC = () => {
 const ThreadListItem: FC = () => {
   const t = useTranslations("Chat");
   const router = useRouter();
-  const threadId = useThreadListItem((m) => m.threadId);
+  const threadRemoteId = useThreadListItem((m) => m.remoteId);
   const handleThreadItemClick = () => {
-    router.push(`/chat/${threadId}`);
+    router.push(`/chat/${threadRemoteId}`);
   };
 
   return (
