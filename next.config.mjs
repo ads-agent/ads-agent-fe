@@ -24,6 +24,18 @@ export default withSentryConfig(
       },
       poweredByHeader: false,
       reactStrictMode: true,
+      images: {
+        remotePatterns: [
+          {
+            protocol: 'https',
+            hostname: 'storage.assistant-ui.com',
+          },
+          {
+            protocol: 'https',
+            hostname: 'img.clerk.com',
+          },
+        ],
+      },
       experimental: {
         serverComponentsExternalPackages: ['@electric-sql/pglite'],
       },
