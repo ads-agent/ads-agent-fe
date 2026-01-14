@@ -117,18 +117,22 @@ const ThreadSuggestions: FC = () => {
     {
       title: t("suggestion_1_title"),
       icon: "📊",
+      content: t("suggestion_1_content"),
     },
     {
       title: t("suggestion_2_title"),
       icon: "🌐",
+      content: t("suggestion_2_content"),
     },
     {
       title: t("suggestion_3_title"),
       icon: "📱",
+      content: t("suggestion_3_content"),
     },
     {
       title: t("suggestion_4_title"),
       icon: "🎨",
+      content: t("suggestion_4_content"),
     },
   ];
 
@@ -140,7 +144,7 @@ const ThreadSuggestions: FC = () => {
           className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-500"
           style={{ animationDelay: `${400 + index * 100}ms` }}
         >
-          <ThreadPrimitive.Suggestion prompt={suggestion.title} send asChild>
+          <ThreadPrimitive.Suggestion prompt={suggestion.title + "\n" + suggestion.content} clearComposer asChild>
             <Button
               variant="outline"
               className="aui-thread-welcome-suggestion h-20 w-80 flex items-center justify-start gap-3 rounded-2xl border-border/40 bg-card/50 px-5 text-sm font-medium transition-all hover:bg-accent hover:shadow-md hover:-translate-y-0.5 group text-left whitespace-normal"
