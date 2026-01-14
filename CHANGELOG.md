@@ -11,6 +11,10 @@
 * **chat-ui**: comprehensive refactor of the chat interface, improving sidebar and thread list layout
 * **api**: ensure chat sharing endpoints are publicly accessible for shared thread viewing
 
+### Bug Fixes
+
+* **chat-ui**: fix thread list highlighting by correcting Tailwind `data-active` selectors to `data-[active]`
+
 ## [1.9.0] (2026-01-12)
 
 

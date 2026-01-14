@@ -92,9 +92,9 @@ const ThreadListItem: FC = () => {
   };
 
   return (
-    <ThreadListItemPrimitive.Root className="aui-thread-list-item group flex h-10 items-center rounded-xl transition-all hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none data-active:bg-muted/80 data-active:text-foreground">
+    <ThreadListItemPrimitive.Root className="aui-thread-list-item group flex h-10 items-center rounded-xl transition-all hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none data-[active]:bg-muted/80 data-[active]:text-foreground">
       <ThreadListItemPrimitive.Trigger
-        className="aui-thread-list-item-trigger flex h-full flex-1 items-center truncate px-4 text-start text-[13px] font-medium text-muted-foreground/70 transition-colors group-hover:text-foreground/80 group-data-active:text-foreground"
+        className="aui-thread-list-item-trigger flex h-full flex-1 items-center truncate px-4 text-start text-[13px] font-medium text-muted-foreground/70 transition-colors group-hover:text-foreground/80 group-data-[active]:text-foreground"
         onClick={handleThreadItemClick}
       >
         <ThreadListItemPrimitive.Title fallback={t("new_chat_fallback")} />
