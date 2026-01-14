@@ -1,6 +1,6 @@
 'use client';
 
-import { AssistantIf, AssistantRuntimeProvider, useAssistantRuntime, useAssistantState } from '@assistant-ui/react';
+import { AssistantIf, AssistantRuntimeProvider, useAssistantEvent, useAssistantRuntime, useAssistantState, useThreadListItem } from '@assistant-ui/react';
 import { AssistantChatTransport, useChatRuntime } from '@assistant-ui/react-ai-sdk';
 import { useAuth } from '@clerk/nextjs';
 import { AssistantCloud } from 'assistant-cloud';
@@ -137,6 +137,8 @@ function ThreadSync() {
   // 订阅 thread list 的整体状态
   const threadsState = useAssistantState(({ threads }) => threads);
   const { mainThreadId, threadItems, isLoading } = threadsState;
+  const router = useRouter();
+  const threadRemoteId = useThreadListItem(m => m.remoteId);
 
   const startedLoadingRef = useRef(false);
   const finishedLoadingRef = useRef(false);
@@ -149,6 +151,15 @@ function ThreadSync() {
     window.addEventListener('popstate', handler);
     return () => window.removeEventListener('popstate', handler);
   }, []);
+
+  // 监听所有事件（用于调试）
+  useAssistantEvent('*', (event) => {
+    console.log('事件发生:', event);
+    if (event.event === 'thread.run-end') {
+      // New thread initialized, check if we need to update URL
+      router.push(`/chat/${threadRemoteId || mainThreadId}`);
+    }
+  });
 
   // 1. URL -> Runtime (on navigation/load)
   useEffect(() => {
