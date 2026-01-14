@@ -187,7 +187,7 @@ export const UserMenu = ({ isCollapsed }: UserMenuProps) => {
 
               {tokenBalance !== null && (
                 <div className="flex items-center gap-1.5 text-sm font-bold text-foreground/80">
-                  <div className="size-4 rounded-full bg-yellow-400 flex items-center justify-center text-[10px] text-white">
+                  <div className="flex size-4 items-center justify-center rounded-full bg-yellow-400 text-[10px] text-white">
                     <Coins className="size-2.5" />
                   </div>
                   <span>{tokenBalance.toLocaleString()}</span>
@@ -206,7 +206,7 @@ export const UserMenu = ({ isCollapsed }: UserMenuProps) => {
           <TooltipTrigger asChild>
             <a
               href="/blog"
-              className="flex items-center justify-center rounded-xl size-10 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              className="flex size-10 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               target="_blank"
               rel="noopener noreferrer"
               aria-label={t('user_menu_blog')}

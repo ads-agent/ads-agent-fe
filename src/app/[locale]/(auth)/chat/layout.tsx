@@ -5,11 +5,9 @@ import { AssistantChatTransport, useChatRuntime } from '@assistant-ui/react-ai-s
 import { useAuth } from '@clerk/nextjs';
 import { AssistantCloud } from 'assistant-cloud';
 import {
-  ChevronRight,
   Loader2,
   PanelLeftClose,
   PanelLeftOpen,
-  Plus,
   Search,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -83,17 +81,17 @@ function ChatHeader({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-1.5 cursor-pointer rounded-lg px-2 py-1 hover:bg-muted transition-colors group">
-              <span className="text-sm font-bold tracking-tight text-foreground/80 group-hover:text-foreground transition-colors">
+            <div className="group flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1 transition-colors hover:bg-muted">
+              <span className="text-sm font-bold tracking-tight text-foreground/80 transition-colors group-hover:text-foreground">
                 {currentModelLabel}
               </span>
-              <svg className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="size-4 text-muted-foreground transition-colors group-hover:text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
-            {MODELS.map((model) => (
+            {MODELS.map(model => (
               <DropdownMenuItem
                 key={model.value}
                 onClick={() => setSelectedModel(model.value)}
@@ -110,7 +108,7 @@ function ChatHeader({
         <AssistantIf condition={({ thread }) => !thread.isEmpty}>
           <button
             type="button"
-            className="flex items-center gap-2 rounded-full border bg-card px-4 py-1.5 text-sm font-medium hover:bg-muted transition-all shadow-sm active:scale-95"
+            className="flex items-center gap-2 rounded-full border bg-card px-4 py-1.5 text-sm font-medium shadow-sm transition-all hover:bg-muted active:scale-95"
             onClick={() => setShareModalOpen(true)}
           >
             <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -318,11 +316,6 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
     },
   });
 
-  const onNewChat = () => {
-    setSidebarOpen(false);
-    window.location.assign('/chat');
-  };
-
   return (
     <TooltipProvider delayDuration={150}>
       <AssistantRuntimeProvider runtime={runtime}>
@@ -364,14 +357,14 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                             height={26}
                             className="size-6.5 object-contain"
                           />
-                          <span className="tracking-tight text-foreground/90 font-bold">
+                          <span className="font-bold tracking-tight text-foreground/90">
                             AdBuddy
                             <span className="text-blue-500">.ai</span>
                           </span>
                         </div>
                         <button
                           type="button"
-                          className="rounded-md p-1.5 hover:bg-muted text-muted-foreground transition-colors"
+                          className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted"
                           onClick={() => setIsCollapsed(true)}
                           aria-label={t('sidebar_collapse')}
                         >
@@ -383,7 +376,7 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
                       <div className="flex w-full justify-center">
                         <button
                           type="button"
-                          className="flex size-10 items-center justify-center rounded-md hover:bg-muted transition-colors"
+                          className="flex size-10 items-center justify-center rounded-md transition-colors hover:bg-muted"
                           onClick={() => {
                             if (window.innerWidth < 768) {
                               setSidebarOpen(false);
@@ -434,7 +427,7 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
               </div>
 
               {/* Sidebar footer */}
-              <div className="p-3 space-y-3">
+              <div className="space-y-3 p-3">
                 <UserMenu isCollapsed={isCollapsed} />
               </div>
             </div>

@@ -1,3 +1,16 @@
+## [1.9.1] (2026-01-13)
+
+
+### Features
+
+* **chat-ui**: update welcome suggestions prompts and behavior for better user onboarding
+* **chat-ui**: hide welcome badge in the chat interface to streamline the welcome view
+* **chat**: implement model selection and ensure selected model is passed to the backend completions API
+* **i18n**: expand localization support to `UserMenu`, `SettingsModal`, and other key UI components
+* **chat-ui**: refactor `SettingsModal` for better structural organization and UX
+* **chat-ui**: comprehensive refactor of the chat interface, improving sidebar and thread list layout
+* **api**: ensure chat sharing endpoints are publicly accessible for shared thread viewing
+
 ## [1.9.0] (2026-01-12)
 
 

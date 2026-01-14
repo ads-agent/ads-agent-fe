@@ -6,6 +6,10 @@ const config = {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      spacing: {
+        4.5: '1.125rem',
+        6.5: '1.625rem',
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

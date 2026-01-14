@@ -45,7 +45,7 @@ export const TokenPurchase = ({ variant = 'default' }: { variant?: 'default' | '
       <div className="flex flex-col gap-5">
         <h3 className="text-sm font-bold text-foreground/90">{t('token_purchase_title')}</h3>
         <div className="flex items-center gap-6">
-          <p className="flex-1 text-xs text-muted-foreground font-medium leading-relaxed">
+          <p className="flex-1 text-xs font-medium leading-relaxed text-muted-foreground">
             {t('token_purchase_description')}
           </p>
           <div className="flex items-center gap-3">
@@ -53,14 +53,14 @@ export const TokenPurchase = ({ variant = 'default' }: { variant?: 'default' | '
               id="quantity"
               type="number"
               min="1"
-              className="h-10 w-20 rounded-xl text-sm font-bold bg-background dark:bg-zinc-950 border-muted-foreground/20"
+              className="h-10 w-20 rounded-xl border-muted-foreground/20 bg-background text-sm font-bold dark:bg-zinc-950"
               value={quantity}
               onChange={e => setQuantity(Number.parseInt(e.target.value) || 1)}
               disabled={isLoading}
             />
             <Button
               size="sm"
-              className="h-10 rounded-xl px-6 text-xs font-bold shadow-md shadow-primary/10 transition-all active:scale-95 whitespace-nowrap"
+              className="h-10 whitespace-nowrap rounded-xl px-6 text-xs font-bold shadow-md shadow-primary/10 transition-all active:scale-95"
               onClick={onPurchase}
               disabled={isLoading}
             >
