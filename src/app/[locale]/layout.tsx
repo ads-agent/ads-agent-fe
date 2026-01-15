@@ -1,12 +1,20 @@
 import '@/styles/global.css';
 
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { NextIntlClientProvider, useMessages } from 'next-intl';
 import { unstable_setRequestLocale } from 'next-intl/server';
 
 import { ThemeProvider } from '@/components/ThemeProvider';
 // import { DemoBadge } from '@/components/DemoBadge';
 import { AllLocales } from '@/utils/AppConfig';
+
+export const viewport: Viewport = {
+  themeColor: '#ffffff',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: {
@@ -24,6 +32,11 @@ export const metadata: Metadata = {
       url: '/assets/images/adbuddy_logo_small.png',
     },
   ],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'AdBuddy',
+  },
 };
 
 export function generateStaticParams() {

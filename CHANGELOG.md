@@ -3,6 +3,9 @@
 
 ### Features
 
+* **pwa**: convert the website into a Progressive Web App (PWA) using `@ducanh2912/next-pwa`, enabling installability and offline support
+* **pwa**: implement a custom Web App Manifest (`manifest.ts`) with AdBuddy branding and standardized icons
+* **pwa**: optimize mobile UX with specialized viewport settings and `appleWebApp` metadata for iOS support
 * **chat-api**: implement video understanding via Cloudinary frame extraction, enabling the model to "see" video content through sampled frames
 * **chat-api**: add CSV file processing support, allowing users to upload and analyze CSV data with automatic text conversion and truncation
 * **api**: add `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` environment variables for media processing configuration
