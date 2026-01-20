@@ -12,7 +12,6 @@ import {
   Search,
 } from 'lucide-react';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
@@ -29,6 +28,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { ShareChatModal } from '@/features/chat/ShareChatModal';
 import { UserMenu } from '@/features/chat/UserMenu';
 import { Env } from '@/libs/Env';
+import { usePathname, useRouter } from '@/libs/i18nNavigation';
 import { cn } from '@/utils/Helpers';
 
 const MODELS = [

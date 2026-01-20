@@ -1,3 +1,11 @@
+## [1.10.1] (2026-01-19)
+
+
+### Bug Fixes
+
+* **error-handling**: fix `TypeError: Cannot read properties of undefined (reading 'locale')` in `global-error.tsx` by adding null checks for `props.params`
+* **chat-ui**: resolve page refresh issues after first message by switching to localized `useRouter` and `usePathname` from `@/libs/i18nNavigation`
+
 ## [1.10.0] (2026-01-14)
 
 

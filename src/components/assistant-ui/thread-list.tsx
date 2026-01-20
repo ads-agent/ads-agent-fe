@@ -11,7 +11,7 @@ import {
 import { ArchiveIcon, PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { FC } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/libs/i18nNavigation";
 
 interface ThreadListProps {
   isCollapsed?: boolean;
